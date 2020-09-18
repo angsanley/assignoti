@@ -2,7 +2,10 @@
     <button
             class="button"
             v-bind="$attrs"
-            :class="{ primary : this.primary }"
+            :class="{
+                primary : this.primary,
+                dark : this.dark
+            }"
             @click="handleClick()">
         <div class="button-content">
             <img v-if="iconSrc" :class="iconClass" :src="iconSrc" class="icon">
@@ -16,6 +19,10 @@
         name: "Button",
         props: {
             primary: {
+                type: Boolean,
+                default: false
+            },
+            dark: {
                 type: Boolean,
                 default: false
             },
@@ -63,5 +70,13 @@
 
     .button-content {
         @apply flex h-full items-center;
+    }
+
+    .dark {
+        @apply w-full bg-gray-700 text-white;
+    }
+
+    .dark:hover {
+        @apply bg-gray-600;
     }
 </style>

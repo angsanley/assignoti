@@ -12,7 +12,7 @@
             <Button
                     :icon-src="require('../assets/icons/github.svg')"
                     @click="doSocialSignIn('github')"
-                    class="githubButton">
+                    dark>
                 Sign in with GitHub
             </Button>
         </Card>
@@ -53,13 +53,5 @@
 
     .logo {
         @apply h-24;
-    }
-
-    .githubButton {
-        @apply w-full bg-gray-700 text-white;
-    }
-
-    .githubButton:hover {
-        @apply bg-gray-600
     }
 </style>
