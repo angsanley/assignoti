@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import App from './App.vue'
+import router from './router'
 import { rtdbPlugin } from 'vuefire'
-
 
 // setup font faces
 import "typeface-inter"
@@ -10,7 +10,6 @@ import "typeface-quicksand"
 // setup tailwind css
 import './assets/css/tailwind.css'
 import './assets/css/main.css'
-import router from './router'
 
 // setup plugins
 Vue.use(rtdbPlugin)
