@@ -9,7 +9,6 @@ const routes = [
     path: '/',
     name: 'Home',
     component: Home,
-    meta: { requiresAuth: false }
   },
   {
     path: '/about',
@@ -21,7 +20,12 @@ const routes = [
     path: '/login',
     name: 'Login',
     component: () => import('../views/Login.vue'),
-    meta: { requiresAuth: false }
+  },
+  {
+    path: '/channels',
+    name: 'Channels',
+    component: () => import('../views/Channels.vue'),
+    meta: { requiresAuth: true }
   }
 ]
 

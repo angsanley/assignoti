@@ -31,7 +31,7 @@ const init = async () => {
 
   // setup plugins
   Vue.use(rtdbPlugin)
-  Vue.use(AuthGuard, { auth: firebase.auth(), router, options: {postAuthPath: "/", assumeIfUndefined: "public" }});
+  Vue.use(AuthGuard, { auth: firebase.auth(), router, options: {postAuthPath: "/channels", assumeIfUndefined: "public" }});
 }
 
 init().then(() => {
