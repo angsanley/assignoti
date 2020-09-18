@@ -4,6 +4,7 @@ import router from './router'
 import { rtdbPlugin } from 'vuefire'
 import { initializeApp } from './plugins/firebase'
 import { AuthGuard } from "vue-firebase-auth-plugins"
+import VModal from 'vue-js-modal'
 
 // setup font faces
 import "typeface-inter"
@@ -31,7 +32,14 @@ const init = async () => {
 
   // setup plugins
   Vue.use(rtdbPlugin)
-  Vue.use(AuthGuard, { auth: firebase.auth(), router, options: {postAuthPath: "/channels", assumeIfUndefined: "public" }});
+  Vue.use(AuthGuard, { auth: firebase.auth(), router, options: {postAuthPath: "/channels", assumeIfUndefined: "public" }})
+
+  Vue.use(VModal, {
+    dialog: true,
+    dynamicDefaults: {
+      draggable: true
+    }
+  })
 }
 
 init().then(() => {

@@ -1,8 +1,9 @@
 <template>
     <div class="text-center space-y-2">
+        <add-channel-modal/>
         <h3>Your channels</h3>
         <div class="channels">
-            <button>
+            <button @click="addNewChannel()">
                 <Card class="item add-item space-y-2">
                     <PlusIcon/>
                     <span>Add new channel</span>
@@ -21,9 +22,15 @@
 <script>
     import Card from "../components/Card";
     import { PlusIcon } from 'vue-feather-icons'
+    import AddChannelModal from "../components/AddChannelModal";
     export default {
         name: "Channels",
-        components: {Card, PlusIcon},
+        components: {AddChannelModal, Card, PlusIcon},
+        methods: {
+          addNewChannel() {
+              this.$modal.show('add-channel-modal')
+          }
+        },
         data() {
             return {
                 channels: [
