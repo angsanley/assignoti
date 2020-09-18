@@ -33,13 +33,7 @@ const init = async () => {
   // setup plugins
   Vue.use(rtdbPlugin)
   Vue.use(AuthGuard, { auth: firebase.auth(), router, options: {postAuthPath: "/channels", assumeIfUndefined: "public" }})
-
-  Vue.use(VModal, {
-    dialog: true,
-    dynamicDefaults: {
-      draggable: true
-    }
-  })
+  Vue.use(VModal)
 }
 
 init().then(() => {

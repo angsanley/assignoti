@@ -1,6 +1,5 @@
 <template>
     <div class="text-center space-y-2">
-        <add-channel-modal/>
         <h3>Your channels</h3>
         <div class="channels">
             <button @click="addNewChannel()">
@@ -16,6 +15,7 @@
                 </Card>
             </button>
         </div>
+        <add-channel-modal/>
     </div>
 </template>
 
