@@ -26,8 +26,17 @@
         name: "Login",
         components: {Button, Card},
         methods: {
-            doSocialSignIn(provider) {
-                alert(provider)
+            doSocialSignIn(using) {
+                let provider
+
+                if (using === 'google') provider = new this.$firebase.auth.GoogleAuthProvider()
+                if (using === 'github') provider = new this.$firebase.auth.GithubAuthProvider()
+
+                this.$firebase.auth().signInWithPopup(provider).then(() => {
+
+                }).catch(e => {
+                    console.log(e.message)
+                })
             }
         }
     }
