@@ -12,6 +12,7 @@ import "typeface-quicksand"
 // setup tailwind css
 import './assets/css/tailwind.css'
 import './assets/css/main.css'
+import store from './store'
 
 Vue.config.productionTip = false
 
@@ -36,6 +37,7 @@ const init = async () => {
 init().then(() => {
   new Vue({
     router,
+    store,
     render: h => h(App)
   }).$mount('#app')
 })
