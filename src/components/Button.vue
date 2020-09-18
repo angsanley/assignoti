@@ -38,7 +38,7 @@
 
 <style scoped>
     .button {
-        @apply py-2 px-4 shadow-lg rounded-full font-display font-bold transition ease-in-out duration-200 border-solid border border-gray-300;
+        @apply py-2 px-4 bg-white shadow-lg rounded-full font-display font-bold transition ease-in-out duration-200 border-solid border border-gray-300;
     }
 
     .primary {
