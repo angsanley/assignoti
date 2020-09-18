@@ -1,15 +1,48 @@
 <template>
-    <div>
+    <div class="login-page space-y-12">
+        <img src="../assets/logo.svg" alt="Logo" class="logo"/>
+        <Card class="login-card space-y-2">
+            <Button
+                    :icon-src="require('../assets/icons/google.svg')"
+                    @click="doSocialSignIn('google')"
+                    class="w-full">
+                Sign in with Google
+            </Button>
 
+            <Button
+                    :icon-src="require('../assets/icons/github.svg')"
+                    @click="doSocialSignIn('github')"
+                    class="w-full bg-black text-white">
+                Sign in with GitHub
+            </Button>
+        </Card>
     </div>
 </template>
 
 <script>
+    import Card from "../components/Card";
+    import Button from "../components/Button";
     export default {
-        name: "Login"
+        name: "Login",
+        components: {Button, Card},
+        methods: {
+            doSocialSignIn(provider) {
+                alert(provider)
+            }
+        }
     }
 </script>
 
 <style scoped>
+    .login-page {
+        @apply flex flex-col items-center;
+    }
 
+    .login-card {
+        width: 20rem;
+    }
+
+    .logo {
+        @apply h-24;
+    }
 </style>
