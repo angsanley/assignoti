@@ -9,6 +9,7 @@ import "typeface-quicksand"
 // setup tailwind css
 import './assets/css/tailwind.css'
 import './assets/css/main.css'
+import router from './router'
 
 // setup plugins
 Vue.use(firestorePlugin)
@@ -16,5 +17,6 @@ Vue.use(firestorePlugin)
 Vue.config.productionTip = false
 
 new Vue({
-  render: h => h(App),
+  router,
+  render: h => h(App)
 }).$mount('#app')
