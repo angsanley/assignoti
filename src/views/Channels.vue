@@ -11,7 +11,7 @@
 
             <button v-for="channel in channels" :key="channel.id">
                 <Card class="item">
-                    {{ channel.name }}
+                    {{ channel.channelName }}
                 </Card>
             </button>
         </div>
@@ -23,6 +23,8 @@
     import Card from "../components/Card";
     import { PlusIcon } from 'vue-feather-icons'
     import AddChannelModal from "../components/AddChannelModal";
+    import firebase from "firebase/app"
+
     export default {
         name: "Channels",
         components: {AddChannelModal, Card, PlusIcon},
@@ -33,11 +35,12 @@
         },
         data() {
             return {
-                channels: [
-                    { id: 0, name: "COMP6153 - Operating System (LA03)" }
-                ]
+                channels: []
             }
-        }
+        },
+        firebase: {
+            channels: firebase.database().ref('channels/')
+        },
     }
 </script>
 
