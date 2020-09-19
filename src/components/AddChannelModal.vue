@@ -41,7 +41,7 @@
                 const payload = JSON.parse(JSON.stringify(this.form))
 
                 dbRef.push(payload).then(() => {
-                    this.$emit('close')
+                    this.$modal.hide('add-channel-modal')
                 }).catch(e => {
                     this.errorMessage = e.message
                 })
