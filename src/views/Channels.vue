@@ -9,7 +9,7 @@
                 </Card>
             </button>
 
-            <button v-for="channel in channels" :key="channel.id">
+            <button v-for="channel in channels" :key="channel.id" @click="gotoChannel(channel.id)">
                 <Card class="item">
                     {{ channel.channelName }}
                 </Card>
@@ -29,9 +29,12 @@
         name: "Channels",
         components: {AddChannelModal, Card, PlusIcon},
         methods: {
-          addNewChannel() {
-              this.$modal.show('add-channel-modal')
-          }
+            addNewChannel() {
+                this.$modal.show('add-channel-modal')
+            },
+            gotoChannel(id) {
+                this.$router.push(`/channels/${id}`)
+            }
         },
         data() {
             return {

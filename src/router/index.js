@@ -26,6 +26,12 @@ const routes = [
     name: 'Channels',
     component: () => import('../views/Channels.vue'),
     meta: { requiresAuth: true }
+  },
+  {
+    path: '/channels/:id',
+    name: 'View Channel',
+    component: () => import('../views/ChannelEdit.vue'),
+    meta: { requiresAuth: true }
   }
 ]
 
