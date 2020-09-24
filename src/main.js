@@ -5,6 +5,8 @@ import { rtdbPlugin } from 'vuefire'
 import { initializeApp } from './plugins/firebase'
 import { AuthGuard } from "vue-firebase-auth-plugins"
 import VModal from 'vue-js-modal'
+const VueUploadComponent = require('vue-upload-component')
+Vue.component('file-upload', VueUploadComponent)
 
 // setup font faces
 import "typeface-inter"

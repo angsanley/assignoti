@@ -30,8 +30,12 @@ const routes = [
   {
     path: '/channels/:id',
     name: 'View Channel',
-    component: () => import('../views/ChannelEdit.vue'),
-    meta: { requiresAuth: true }
+    component: () => import('../views/ChannelDetail.vue'),
+    meta: { requiresAuth: true },
+    children: [
+        { path: '', component: () => import('../views/ChannelEdit.vue') },
+        { path: 'new-task', component: () => import('../views/NewTask.vue') },
+    ]
   }
 ]
 
