@@ -25,6 +25,9 @@
                     </Button>
                 </form>
             </Card>
+            <div class="pt-4" v-if="taskKey">
+                <button @click="deleteTask()"><span class="text-red-600">Delete task</span></button>
+            </div>
         </div>
     </div>
 </template>
@@ -109,6 +112,19 @@
                     alert('error')
                     console.log(e.message)
                 })
+            },
+            deleteTask() {
+                if (confirm('Really delete this task?')) {
+                    const db = this.$firebase.database()
+                    const dbRef = db.ref(`channels/${this.channelKey}/tasks/${this.taskKey}`)
+
+                    dbRef.remove().then(() => {
+                        this.$router.push(`/channels/${this.channelId}`)
+                    }).catch(e => {
+                        alert('error')
+                        console.log(e.message)
+                    })
+                }
             },
             getEditorMarkdown() {
                 return this.$refs.descriptionEditor.invoke('getMarkdown');
