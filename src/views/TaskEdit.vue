@@ -10,14 +10,18 @@
                         <Input v-model="form.name" name="task-name" id="task-name" type="text" placeholder="Cook an egg fried rice" :required="true" maxlength="48"/>
                     </div>
                     <div>
-                        <label for="task-name">Description:</label>
-                        <editor ref="descriptionEditor" initialEditType="wysiwyg"/>
-                    </div>
-                    <div>
                         <label for="task-deadline">Deadline:</label>
                         <date-picker :min-date='new Date()' v-model="form.deadline">
                             <Input :value="form.deadline | dateFormat" name="task-deadline" id="task-deadline" type="text" placeholder="Task deadline" :required="true" maxlength="32"/>
                         </date-picker>
+                    </div>
+                    <div>
+                        <label>Description:</label>
+                        <editor ref="descriptionEditor" initialEditType="wysiwyg"/>
+                    </div>
+                    <div>
+                        <label for="attachment">Attachment:</label>
+
                     </div>
                     <Button class="pt-4" primary>
                         <span class="text-center w-full" v-if="!this.taskKey">Add Task</span>
