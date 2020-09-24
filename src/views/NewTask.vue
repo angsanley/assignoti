@@ -6,12 +6,12 @@
                 <form @submit.prevent="addTask()" class="flex flex-col space-y-4">
                     <div>
                         <label for="task-name">Task name:</label>
-                        <Input v-model="form.name" name="task-name" id="task-name" type="text" placeholder="Cook an egg fried rice" :required="true"/>
+                        <Input v-model="form.name" name="task-name" id="task-name" type="text" placeholder="Cook an egg fried rice" :required="true" maxlength="48"/>
                     </div>
                     <div>
                         <label for="task-deadline">Deadline:</label>
                         <date-picker :min-date='new Date()' v-model="form.deadline">
-                            <Input :value="form.deadline | dateFormat" name="task-deadline" id="task-deadline" type="text" placeholder="Task deadline" :required="true" :maxlength="64"/>
+                            <Input :value="form.deadline | dateFormat" name="task-deadline" id="task-deadline" type="text" placeholder="Task deadline" :required="true" maxlength="32"/>
                         </date-picker>
                     </div>
                     <Button class="pt-4" primary><span class="text-center w-full">Add Task</span></Button>
