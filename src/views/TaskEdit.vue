@@ -63,7 +63,7 @@
         computed: {
             channelKey() {
                 return Object.keys(this.channel)[0]
-            }
+            },
         },
         methods: {
             bindChannel(channelId) {

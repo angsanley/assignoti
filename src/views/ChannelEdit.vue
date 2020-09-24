@@ -1,7 +1,6 @@
 <template>
     <div class="text-center space-y-2">
         <h3 v-if="channel">{{ channel[channelKey].channelName }}</h3>
-        <Button @click="addNewTask()" v-if="user">Add new task</Button>
 
         <div class="space-y-2 pt-4">
             <span class="font-medium" v-if="upcomingTasks.length > 0">Upcoming tasks:</span>
@@ -27,17 +26,18 @@
             </div>
         </div>
 
+        <floating-action-button primary @click="addNewTask()" v-if="user"><PlusIcon/></floating-action-button>
     </div>
 </template>
 
 <script>
-    import Button from "../components/Button";
     import Card from "../components/Card";
     import moment from "moment"
-    import { CalendarIcon } from 'vue-feather-icons'
+    import { CalendarIcon, PlusIcon } from 'vue-feather-icons'
+    import FloatingActionButton from "../components/FloatingActionButton";
     export default {
         name: "ChannelEdit",
-        components: {Card, Button, CalendarIcon},
+        components: {FloatingActionButton, Card, CalendarIcon, PlusIcon},
         data() {
             return {
                 channel: {},
@@ -86,7 +86,7 @@
                 })
             },
             addNewTask() {
-                this.$router.push(`/channels/${this.channelId}/new-task`)
+                this.$router.push(`/channels/${this.channelId}/task/new`)
             },
             populateTasks() {
                 const tasksObj = this.channel[this.channelKey]['tasks']
@@ -100,7 +100,6 @@
                 })
             },
             gotoTask(taskKey) {
-                console.log(taskKey)
                 this.$router.push(`/channels/${this.channelId}/task/${taskKey}`)
             }
         },

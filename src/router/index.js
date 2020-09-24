@@ -34,8 +34,9 @@ const routes = [
     meta: { requiresAuth: false },
     children: [
         { path: '', component: () => import('../views/ChannelEdit.vue') },
-        { path: 'new-task', component: () => import('../views/TaskEdit.vue'), meta: { requiresAuth: true } },
-        { path: 'task/:taskKey', component: () => import('../views/TaskEdit.vue') },
+        { path: 'task/:taskKey', component: () => import('../views/ViewTask.vue') },
+        { path: 'task/new', component: () => import('../views/TaskEdit.vue'), meta: { requiresAuth: true } },
+        { path: 'task/:taskKey/edit', component: () => import('../views/TaskEdit.vue'), meta: { requiresAuth: true } },
     ]
   }
 ]
