@@ -1,12 +1,11 @@
 {
   "rules": {
-    ".read": "auth.uid != null",
-    ".write": "auth.uid != null",
+    ".read": false,
+    ".write": false,
     "channels": {
-      "$uid": {
-        ".read": true,
-        ".write": "auth.uid != null",
-      }
+      ".indexOn": "id",
+      ".read": true,
+      ".write": "auth.uid != null",
     }
   }
 }
