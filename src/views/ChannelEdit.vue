@@ -6,7 +6,7 @@
         <div class="space-y-2 pt-4">
             <span class="font-medium" v-if="upcomingTasks.length > 0">Upcoming tasks:</span>
             <div class="flex flex-col items-center" v-for="task in upcomingTasks" :key="task['.key']">
-                <button class="w-5/6 lg:w-3/6 selectable">
+                <button class="w-5/6 lg:w-3/6 selectable" @click="gotoTask(task['.key'])">
                     <Card class="item">
                         <div class="font-bold font-display truncate">{{ task.name }}</div>
                         <div class="text-sm flex items-center space-x-2"><CalendarIcon size="1x"/> <div>{{ task.deadlineDate | dateFormat }}</div></div>
@@ -92,6 +92,10 @@
                     tasksObj[key]['.key'] = key
                     this.tasks.push(tasksObj[key])
                 })
+            },
+            gotoTask(taskKey) {
+                console.log(taskKey)
+                this.$router.push(`/channels/${this.channelId}/task/${taskKey}`)
             }
         },
         filters: {

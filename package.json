@@ -14,6 +14,8 @@
     "watch": "run-p build:watch serve:firebase"
   },
   "dependencies": {
+    "@toast-ui/editor": "^2.4.0",
+    "@toast-ui/vue-editor": "^2.4.0",
     "autoprefixer": "^9.8.0",
     "axios": "^0.20.0",
     "core-js": "^3.6.5",
