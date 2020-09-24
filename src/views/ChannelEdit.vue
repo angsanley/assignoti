@@ -8,7 +8,7 @@
             <div class="flex flex-col items-center" v-for="task in upcomingTasks" :key="task['.key']">
                 <button class="w-5/6 lg:w-3/6 selectable">
                     <Card class="item">
-                        <div class="font-bold font-display">{{ task.name }}</div>
+                        <div class="font-bold font-display truncate">{{ task.name }}</div>
                         <div class="text-sm flex items-center space-x-2"><CalendarIcon size="1x"/> <div>{{ task.deadlineDate | dateFormat }}</div></div>
                     </Card>
                 </button>
@@ -20,7 +20,7 @@
             <div class="flex flex-col items-center" v-for="task in pastTasks" :key="task['.key']">
                 <button class="w-5/6 lg:w-3/6 selectable">
                     <Card class="item">
-                        <div class="font-bold font-display">{{ task.name }}</div>
+                        <div class="font-bold font-display truncate">{{ task.name }}</div>
                         <div class="text-sm flex items-center space-x-2"><CalendarIcon size="1x"/> <div>{{ task.deadlineDate | dateFormat }}</div></div>
                     </Card>
                 </button>
