@@ -11,7 +11,7 @@
                     <div>
                         <label for="task-deadline">Deadline:</label>
                         <date-picker :min-date='new Date()' v-model="form.deadline">
-                            <Input :value="form.deadline | dateFormat" name="task-deadline" id="task-deadline" type="text" placeholder="Task deadline" :required="true"/>
+                            <Input :value="form.deadline | dateFormat" name="task-deadline" id="task-deadline" type="text" placeholder="Task deadline" :required="true" :maxlength="64"/>
                         </date-picker>
                     </div>
                     <Button class="pt-4" primary><span class="text-center w-full">Add Task</span></Button>
