@@ -37,8 +37,8 @@
     import Card from "../components/Card";
     import Button from "../components/Button";
     import DatePicker from 'v-calendar/lib/components/date-picker.umd'
-    import 'codemirror/lib/codemirror.css';
-    import '@toast-ui/editor/dist/toastui-editor.css';
+    import '../assets/css/codemirror.css';
+    import '../assets/css/toastui-editor.css';
     import { Editor } from '@toast-ui/vue-editor';
     import moment from 'moment'
     export default {
