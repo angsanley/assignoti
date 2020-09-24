@@ -31,10 +31,10 @@ const routes = [
     path: '/channels/:id',
     name: 'View Channel',
     component: () => import('../views/ChannelDetail.vue'),
-    meta: { requiresAuth: true },
+    meta: { requiresAuth: false },
     children: [
         { path: '', component: () => import('../views/ChannelEdit.vue') },
-        { path: 'new-task', component: () => import('../views/TaskEdit.vue') },
+        { path: 'new-task', component: () => import('../views/TaskEdit.vue'), meta: { requiresAuth: true } },
         { path: 'task/:taskKey', component: () => import('../views/TaskEdit.vue') },
     ]
   }

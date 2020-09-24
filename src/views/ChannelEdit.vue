@@ -1,7 +1,7 @@
 <template>
     <div class="text-center space-y-2">
         <h3 v-if="channel">{{ channel[channelKey].channelName }}</h3>
-        <Button @click="addNewTask()">Add new task</Button>
+        <Button @click="addNewTask()" v-if="user">Add new task</Button>
 
         <div class="space-y-2 pt-4">
             <span class="font-medium" v-if="upcomingTasks.length > 0">Upcoming tasks:</span>
@@ -62,13 +62,19 @@
                     if (moment().diff(task.deadlineDate, 'days') > 0) pastTasks.push(task)
                 })
                 return pastTasks
-            }
+            },
+            user() {
+                return this.$store.state.user
+            },
         },
         mounted() {
             if (!parseInt(this.$route.params.id)) {
                 this.$router.push('/')
             } else {
                 this.channelId = parseInt(this.$route.params.id)
+
+                // get current user
+                this.$store.dispatch('getAuthenticatedUser')
             }
         },
         methods: {
