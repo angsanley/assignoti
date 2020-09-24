@@ -2,8 +2,8 @@
     <div class="text-center space-y-2">
         <h3 v-if="!taskKey">New Task</h3>
         <h3 v-else>Edit Task</h3>
-        <div class="text-left flex flex-col items-center">
-            <Card class="w-4/6 lg:w-2/6">
+        <div class="text-left flex flex-col items-center px-4 lg:px-0">
+            <Card class="w-full md:w-3/6 xl:w-2/6">
                 <form @submit.prevent="handleSubmit()" class="flex flex-col space-y-4">
                     <div>
                         <label for="task-name">Task name:</label>
