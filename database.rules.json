@@ -1,6 +1,12 @@
 {
   "rules": {
-    ".read": "now < 1602954000000",  // 2020-10-18
-    ".write": "now < 1602954000000",  // 2020-10-18
+    ".read": "auth.uid != null",
+    ".write": "auth.uid != null",
+    "channels": {
+      "$uid": {
+        ".read": true,
+        ".write": "auth.uid != null",
+      }
+    }
   }
 }
