@@ -59,7 +59,7 @@
                 const pushData = {
                     name: this.form.name,
                     deadlineDate: this.form.deadline.toISOString(),
-                    author: this.$firebase.currentUser.uid
+                    author: this.$firebase.auth().currentUser.uid
                 }
 
                 dbRef.push(pushData).then(() => {
