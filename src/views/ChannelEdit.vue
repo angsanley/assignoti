@@ -1,27 +1,67 @@
 <template>
     <div class="text-center space-y-2">
         <h3 v-if="channel">{{ channel[channelKey].channelName }}</h3>
-        <div>
-            {{ channel[channelKey]['tasks'] }}
-        </div>
         <Button @click="addNewTask()">Add new task</Button>
+
+        <div class="space-y-2 pt-4">
+            <span class="font-medium" v-if="upcomingTasks.length > 0">Upcoming tasks:</span>
+            <div class="flex flex-col items-center" v-for="task in upcomingTasks" :key="task['.key']">
+                <button class="w-5/6 lg:w-3/6 selectable">
+                    <Card class="item">
+                        <div class="font-bold font-display">{{ task.name }}</div>
+                        <div class="text-sm flex items-center space-x-2"><CalendarIcon size="1x"/> <div>{{ task.deadlineDate | dateFormat }}</div></div>
+                    </Card>
+                </button>
+            </div>
+        </div>
+
+        <div class="space-y-2 pt-4">
+            <span class="font-medium" v-if="pastTasks.length > 0">Past tasks:</span>
+            <div class="flex flex-col items-center" v-for="task in pastTasks" :key="task['.key']">
+                <button class="w-5/6 lg:w-3/6 selectable">
+                    <Card class="item">
+                        <div class="font-bold font-display">{{ task.name }}</div>
+                        <div class="text-sm flex items-center space-x-2"><CalendarIcon size="1x"/> <div>{{ task.deadlineDate | dateFormat }}</div></div>
+                    </Card>
+                </button>
+            </div>
+        </div>
+
     </div>
 </template>
 
 <script>
     import Button from "../components/Button";
+    import Card from "../components/Card";
+    import moment from "moment"
+    import { CalendarIcon } from 'vue-feather-icons'
     export default {
         name: "ChannelEdit",
-        components: {Button},
+        components: {Card, Button, CalendarIcon},
         data() {
             return {
                 channel: {},
+                tasks: [],
                 channelId: 0,
             }
         },
         computed: {
             channelKey() {
                 return Object.keys(this.channel)[0]
+            },
+            upcomingTasks() {
+                let upcomingTasks = []
+                this.tasks.forEach(task => {
+                    if (moment().diff(task.deadlineDate, 'days') <= 0) upcomingTasks.push(task)
+                })
+                return upcomingTasks
+            },
+            pastTasks() {
+                let pastTasks = []
+                this.tasks.forEach(task => {
+                    if (moment().diff(task.deadlineDate, 'days') > 0) pastTasks.push(task)
+                })
+                return pastTasks
             }
         },
         mounted() {
@@ -39,24 +79,24 @@
                     console.log(e.message)
                 })
             },
-            // addTask(name, deadline, attachment) {
-            //     // make sure channel is not null
-            //     if (!this.channel) return
-            //
-            //     const dbRef = this.$firebase.database().ref(`channels/${this.channelKey}/tasks`)
-            //     const pushKey = dbRef.push().getKey()
-            //
-            //     // push into db
-            //     dbRef.push({
-            //         name,
-            //         deadline
-            //     })
-            //
-            //     // upload attachment
-            //
-            // },
             addNewTask() {
                 this.$router.push(`/channels/${this.channelId}/new-task`)
+            },
+            populateTasks() {
+                const tasksObj = this.channel[this.channelKey]['tasks']
+                const keys = Object.keys(tasksObj)
+                this.tasks = []
+
+                keys.forEach(key => {
+                    // get single task
+                    tasksObj[key]['.key'] = key
+                    this.tasks.push(tasksObj[key])
+                })
+            }
+        },
+        filters: {
+            dateFormat(date) {
+                return moment(date).format("MMM Do YYYY")
             }
         },
         watch: {
@@ -64,11 +104,26 @@
                 this.bindChannel(val)
             },
             channel() {
+                this.populateTasks()
             }
-        }
+        },
     }
 </script>
 
 <style scoped>
+    .item {
+        @apply flex flex-col text-left w-full h-full transition ease-in-out duration-200
+    }
 
+    .item:hover {
+        @apply bg-gray-200 border border-gray-400
+    }
+
+    .selectable {
+        @apply transition ease-in-out duration-200
+    }
+
+    .selectable:active {
+        @apply transform scale-95
+    }
 </style>
