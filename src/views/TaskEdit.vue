@@ -93,7 +93,7 @@
                 }
 
                 dbRef.update(pushData).then(() => {
-                    this.$router.push(`/channels/${this.channelId}`)
+                    this.$router.push(`/channels/${this.channelId}/task/${this.taskKey}`)
                 }).catch(e => {
                     alert('error')
                     console.log(e.message)
