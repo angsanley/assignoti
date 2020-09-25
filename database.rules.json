@@ -5,7 +5,13 @@
     "channels": {
       ".indexOn": "id",
       ".read": true,
-      ".write": "auth.uid != null",
+      ".write": "auth.uid != null"
+    },
+    "users": {
+      "$uid": {
+        ".read": true,
+        ".write": "auth.uid == $uid"
+      }
     }
   }
 }
