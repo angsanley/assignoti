@@ -10,7 +10,7 @@
     components: {Button},
     methods: {
       doLogout() {
-        this.$firebase.auth().signOut()
+        this.$store.dispatch('doSignOut')
       }
     }
   }

@@ -37,6 +37,17 @@ export default new Vuex.Store({
                     reject(e)
                 })
             }))
+        },
+        doSignOut: ({commit}) => {
+            return new Promise(((resolve, reject) => {
+                firebase.auth().signOut().then(() => {
+                    commit('SET_USER', null)
+                    resolve()
+                }).catch(e => {
+                    console.log(e.message)
+                    reject(e)
+                })
+            }))
         }
     },
     modules: {}
