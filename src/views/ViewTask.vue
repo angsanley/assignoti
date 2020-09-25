@@ -10,7 +10,7 @@
                     <div>
                         <div class="flex items-center space-x-2"><BookIcon size="1x"/> <div>{{ channel[channelKey]['channelName'] }}</div></div>
                         <div class="flex items-center space-x-2"><CalendarIcon size="1x"/> <div>{{ task.deadlineDate | dateFormat }}</div></div>
-                        <div class="flex items-center space-x-2"><UserIcon size="1x"/> <div>Posted by Someone</div></div>
+                        <div class="flex items-center space-x-2"><UserIcon size="1x"/> <div>Posted by {{ task.authorName }}</div></div>
                     </div>
                 </Card>
             </div>
@@ -35,12 +35,14 @@
                 task: {
                     name: '',
                     deadline: new Date(),
-                    description: ''
+                    description: '',
+                    authorName: ''
                 },
                 channel: {},
                 channelId: 0,
                 taskKey: null,
-                firebaseTaskData: null
+                firebaseTaskData: null,
+                firebaseAuthorData: null
             }
         },
         computed: {
@@ -66,6 +68,11 @@
             },
             gotoEditTask() {
                 this.$router.push(`/channels/${this.channelId}/task/${this.taskKey}/edit`)
+            },
+            bindAuthor(authorUid) {
+                const db = this.$firebase.database()
+                const dbRef = db.ref(`users/${authorUid}`)
+                this.$rtdbBind('firebaseAuthorData', dbRef)
             }
         },
         filters: {
@@ -103,6 +110,12 @@
                 this.task.name = val.name
                 this.task.deadline = new Date(val.deadlineDate)
                 this.task.description = val.description
+
+                // bind author data
+                if (!this.firebaseAuthorData) this.bindAuthor(val.author)
+            },
+            firebaseAuthorData(val) {
+                this.task.authorName = val.displayName
             }
         }
     }
