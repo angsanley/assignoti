@@ -21,7 +21,7 @@ export default new Vuex.Store({
                 resolve(user)
             })
         },
-        doSocialSignIn: ({commit}, using) => {
+        doSocialSignIn: ({commit, dispatch}, using) => {
             return new Promise(((resolve, reject) => {
                 let provider
 
@@ -30,7 +30,7 @@ export default new Vuex.Store({
 
                 firebase.auth().signInWithPopup(provider).then((result) => {
                     commit('SET_USER', result.user)
-                    resolve(result.user)
+                    dispatch('updateUser', result.user).then(() => resolve(result.user))
 
                 }).catch(e => {
                     console.log(e.message)
@@ -48,7 +48,18 @@ export default new Vuex.Store({
                     reject(e)
                 })
             }))
+        },
+        // update user object in rtdb
+        updateUser: (_, user) => {
+            return new Promise(((resolve, reject) => {
+                const dbRef = firebase.database().ref(`/users/${user.uid}`)
+                dbRef.update({
+                    displayName: user.displayName,
+                    email: user.email,
+                    photoURL: user.photoURL
+                }).then(() => resolve()).catch(e => reject(e))
+            }))
         }
     },
-    modules: {}
+     modules: {}
 })
