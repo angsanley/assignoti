@@ -1,9 +1,10 @@
 <template>
     <div id="app" class="parent">
-        <div class="bg-primary sidebar">
+        <div class="bg-primary sidebar" :class="{sidebarHidden: hidden}" v-on-clickaway="hideSidebar">
             <the-sidebar/>
         </div>
         <div class="content">
+            <button @click="showSidebar()">sidebar</button>
             <router-view/>
         </div>
     </div>
@@ -11,19 +12,50 @@
 
 <script>
     import TheSidebar from "../components/TheSidebar";
+    import { mixin as clickaway } from 'vue-clickaway'
     export default {
         name: "Dashboard",
-        components: {TheSidebar}
+        components: {TheSidebar},
+        mixins: [ clickaway ],
+        computed: {
+            hidden() {
+                return this.$store.state.sidebarHidden
+            }
+        },
+        methods: {
+            showSidebar() {
+                setTimeout( () => {
+                    this.$store.dispatch('showSidebar')
+                }, 10)
+            },
+            hideSidebar() {
+                this.$store.dispatch('hideSidebar')
+            }
+        }
     }
 </script>
 
 <style scoped>
-    .parent {
-        @apply grid;
-        grid-template-columns: minmax(150px, 16rem) 1fr;
+    .sidebar {
+        @apply h-screen w-64 fixed transition ease-out duration-300 left-0 top-0 z-30;
     }
 
-    .sidebar {
-        @apply h-screen;
+    .sidebarHidden {
+        @apply transform -translate-x-64;
+    }
+
+    @screen lg {
+        .parent {
+            @apply grid;
+            grid-template-columns: minmax(150px, 16rem) 1fr;
+        }
+
+        .sidebar {
+            @apply h-screen ml-0 static;
+        }
+
+        .sidebarHidden {
+            @apply left-0 translate-x-0
+        }
     }
 </style>

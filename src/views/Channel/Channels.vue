@@ -1,6 +1,10 @@
 <template>
-    <div class="text-center space-y-2">
-        <h3>Your channels</h3>
+    <div class="flex justify-center">
+        <div class="container space-y-4">
+            <div>
+                <h1>Explore channels</h1>
+                <p>Find channels here and subscribe to it.</p>
+            </div>
         <div class="channels">
             <button @click="addNewChannel()">
                 <Card class="item add-item space-y-2">
@@ -16,6 +20,7 @@
             </button>
         </div>
         <add-channel-modal/>
+        </div>
     </div>
 </template>
 
@@ -49,7 +54,7 @@
 
 <style scoped>
     .channels {
-        @apply flex flex-wrap items-center justify-center;
+        @apply flex flex-wrap items-center;
     }
 
     .channels > button {

@@ -6,11 +6,15 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
     state: {
-        user: null
+        user: null,
+        sidebarHidden: true
     },
     mutations: {
         SET_USER: (state, newValue) => {
             state.user = newValue
+        },
+        SET_SIDEBAR_HIDDEN: (state, newValue) => {
+            state.sidebarHidden = newValue
         },
     },
     actions: {
@@ -59,6 +63,12 @@ export default new Vuex.Store({
                     photoURL: user.photoURL
                 }).then(() => resolve()).catch(e => reject(e))
             }))
+        },
+        hideSidebar: ({commit}) => {
+            commit('SET_SIDEBAR_HIDDEN', true)
+        },
+        showSidebar: ({commit}) => {
+            commit('SET_SIDEBAR_HIDDEN', false)
         }
     },
      modules: {}

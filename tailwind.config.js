@@ -36,6 +36,10 @@ module.exports = {
         xl: '5rem',
       },
     },
+    inset: {
+      ...defaultTheme.inset,
+      '-64': '-16rem'
+    }
   },
   variants: {},
   plugins: [],

@@ -28,15 +28,15 @@ const routes = [
     component: () => import('../views/Dashboard.vue'),
     meta: { requiresAuth: true },
     children: [
-      { path: '', component: () => import('../views/Dashboard/DashboardHome.vue') },
-      { path: 'subscriptions', component: () => import('../views/Dashboard/Subscriptions.vue') },
+      { path: '', component: () => import('../views/Dashboard/DashboardHome.vue'), meta: { requiresAuth: true } },
+      { path: 'subscriptions', component: () => import('../views/Dashboard/Subscriptions.vue'), meta: { requiresAuth: true } },
+      {
+        path: 'channels',
+        name: 'Channels',
+        component: () => import('../views/Channel/Channels.vue'),
+        meta: { requiresAuth: true }
+      },
     ]
-  },
-  {
-    path: '/channels',
-    name: 'Channels',
-    component: () => import('../views/Channel/Channels.vue'),
-    meta: { requiresAuth: true }
   },
   {
     path: '/channels/:id',
