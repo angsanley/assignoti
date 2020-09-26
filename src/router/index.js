@@ -9,6 +9,7 @@ const routes = [
     path: '/',
     name: 'Home',
     component: Home,
+    redirect: '/dashboard'
   },
   {
     path: '/about',
@@ -20,6 +21,16 @@ const routes = [
     path: '/login',
     name: 'Login',
     component: () => import('../views/Login.vue'),
+  },
+  {
+    path: '/dashboard',
+    name: 'Dashboard',
+    component: () => import('../views/Dashboard.vue'),
+    meta: { requiresAuth: true },
+    children: [
+      { path: '', component: () => import('../views/Dashboard/DashboardHome.vue') },
+      { path: 'subscriptions', component: () => import('../views/Dashboard/Subscriptions.vue') },
+    ]
   },
   {
     path: '/channels',
