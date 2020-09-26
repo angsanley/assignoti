@@ -23,9 +23,9 @@
 <script>
     import moment from "moment";
     import VueMarkdown from "vue-markdown";
-    import Card from "../components/Card";
+    import Card from "../../components/Card";
     import { CalendarIcon, BookIcon, UserIcon, EditIcon } from 'vue-feather-icons'
-    import FloatingActionButton from "../components/FloatingActionButton";
+    import FloatingActionButton from "../../components/FloatingActionButton";
 
     export default {
         name: "ViewTask",

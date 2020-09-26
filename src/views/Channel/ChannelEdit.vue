@@ -31,10 +31,10 @@
 </template>
 
 <script>
-    import Card from "../components/Card";
+    import Card from "../../components/Card";
     import moment from "moment"
     import { CalendarIcon, PlusIcon } from 'vue-feather-icons'
-    import FloatingActionButton from "../components/FloatingActionButton";
+    import FloatingActionButton from "../../components/FloatingActionButton";
     export default {
         name: "ChannelEdit",
         components: {FloatingActionButton, Card, CalendarIcon, PlusIcon},

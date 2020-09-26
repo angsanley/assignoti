@@ -20,9 +20,9 @@
 </template>
 
 <script>
-    import Card from "../components/Card";
+    import Card from "../../components/Card";
     import { PlusIcon } from 'vue-feather-icons'
-    import AddChannelModal from "../components/AddChannelModal";
+    import AddChannelModal from "../../components/AddChannelModal";
     import firebase from "firebase/app"
 
     export default {
