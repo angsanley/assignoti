@@ -38,7 +38,7 @@
                 this.$modal.show('add-channel-modal')
             },
             gotoChannel(id) {
-                this.$router.push(`/channels/${id}`)
+                this.$router.push(`/dashboard/channels/${id}`)
             }
         },
         data() {

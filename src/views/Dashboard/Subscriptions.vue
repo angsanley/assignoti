@@ -31,7 +31,7 @@
         components: {Card, SearchIcon},
         methods: {
             gotoChannel(id) {
-                this.$router.push(`/channels/${id}`)
+                this.$router.push(`/dashboard/channels/${id}`)
             },
             getChannelsInfo(user) {
                 // get channels info
