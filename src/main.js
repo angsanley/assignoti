@@ -16,6 +16,7 @@ import "typeface-quicksand"
 import './assets/css/tailwind.css'
 import './assets/css/main.css'
 import store from './store'
+import './registerServiceWorker'
 
 Vue.config.productionTip = false
 
