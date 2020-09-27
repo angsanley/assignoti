@@ -7,9 +7,7 @@
             <div>
                 <h4>Assignoti</h4>
             </div>
-            <div>
-                <button><img class="user-profile" :src="userObj.photoURL"/></button>
-            </div>
+            <button v-if="this.userObj"><img class="user-profile" :src="userObj.photoURL" alt="profile"/></button>
         </div>
     </div>
 </template>
@@ -30,6 +28,9 @@
             userObj() {
                 return this.$store.state.user
             }
+        },
+        mounted() {
+            this.$store.dispatch('getAuthenticatedUser')
         }
     }
 </script>
