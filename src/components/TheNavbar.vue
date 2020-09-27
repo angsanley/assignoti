@@ -2,7 +2,7 @@
     <div class="navbar">
         <div class="inner space-x-2">
             <div class="mobile-items space-x-2">
-                <button @click="openSidebar()"><div class="toggle-sidebar"><MenuIcon/></div></button>
+                <button @click="openSidebar()" class="toggle-sidebar"><MenuIcon/></button>
             </div>
             <div>
                 <h4>Assignoti</h4>
@@ -44,7 +44,15 @@
     }
 
     .toggle-sidebar {
-        @apply p-2
+        @apply p-2 transition ease-out duration-300
+    }
+
+    .toggle-sidebar:hover {
+        @apply transform shadow-lg bg-gray-200 rounded-lg
+    }
+
+    .toggle-sidebar:active {
+        @apply transform scale-95
     }
 
     .mobile-items {
