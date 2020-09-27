@@ -7,15 +7,16 @@
             <router-link to="/dashboard" class="item" active-class="active" exact><HomeIcon/><span>Home</span></router-link>
             <router-link to="/dashboard/subscriptions" class="item" active-class="active"><BellIcon/><span>Subscriptions</span></router-link>
             <router-link to="/dashboard/channels" class="item" active-class="active"><SearchIcon/><span>Explore Channels</span></router-link>
+            <router-link to="/dashboard/integrations" class="item" active-class="active"><LayersIcon/><span>Integrations</span></router-link>
         </div>
     </div>
 </template>
 
 <script>
-    import { HomeIcon, BellIcon, SearchIcon } from "vue-feather-icons"
+    import { HomeIcon, BellIcon, SearchIcon, LayersIcon } from "vue-feather-icons"
     export default {
         name: "TheSidebar",
-        components: {HomeIcon, BellIcon, SearchIcon}
+        components: {HomeIcon, BellIcon, SearchIcon, LayersIcon}
     }
 </script>
 
