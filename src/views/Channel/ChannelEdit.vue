@@ -129,7 +129,7 @@
                 const subscribedChannels = this.userData['subscribedChannels']
                 const index = subscribedChannels.findIndex(key => key === channelKey)
                 // dont remove array directly, use splice instead
-                subscribedChannels.splice(index, index);
+                subscribedChannels.splice(index, 1);
                 const dbRef = this.$firebase.database().ref(`/users/${this.user.uid}/subscribedChannels`)
                 dbRef.set(subscribedChannels)
             }
