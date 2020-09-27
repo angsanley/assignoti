@@ -6,10 +6,10 @@
                 <p>The tasks of the channels you subscribed will appear on your dashboard. You will also receive notifications about them.</p>
             </div>
             <div class="subscriptions">
-                <button>
+                <button @click="gotoExplore()">
                     <Card class="item add-item space-y-2">
-                        <PlusIcon/>
-                        <span>Add new channel</span>
+                        <SearchIcon/>
+                        <span>Explore channels</span>
                     </Card>
                 </button>
 
@@ -25,10 +25,10 @@
 
 <script>
     import Card from "../../components/Card";
-    import { PlusIcon } from 'vue-feather-icons'
+    import { SearchIcon } from 'vue-feather-icons'
     export default {
         name: "Subscriptions",
-        components: {Card, PlusIcon},
+        components: {Card, SearchIcon},
         methods: {
             gotoChannel(id) {
                 this.$router.push(`/channels/${id}`)
@@ -47,6 +47,9 @@
                 // get user data
                 const users = this.$firebase.database().ref('users')
                 this.$rtdbBind('user', users.child(userObj.uid))
+            },
+            gotoExplore() {
+                this.$router.push('/dashboard/channels')
             }
         },
         mounted() {
