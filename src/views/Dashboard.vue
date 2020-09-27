@@ -4,7 +4,7 @@
             <the-sidebar/>
         </div>
         <div class="content">
-            <button @click="showSidebar()">sidebar</button>
+            <the-navbar/>
             <router-view/>
         </div>
     </div>
@@ -13,9 +13,10 @@
 <script>
     import TheSidebar from "../components/TheSidebar";
     import { mixin as clickaway } from 'vue-clickaway'
+    import TheNavbar from "../components/TheNavbar";
     export default {
         name: "Dashboard",
-        components: {TheSidebar},
+        components: {TheNavbar, TheSidebar},
         mixins: [ clickaway ],
         computed: {
             hidden() {
