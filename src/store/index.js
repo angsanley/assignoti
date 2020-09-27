@@ -1,15 +1,18 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import * as firebase from "firebase";
+import { vuexfireMutations, firebaseAction } from 'vuexfire'
 
 Vue.use(Vuex)
 
 export default new Vuex.Store({
     state: {
         user: null,
+        userData: null,
         sidebarHidden: true
     },
     mutations: {
+        ...vuexfireMutations,
         SET_USER: (state, newValue) => {
             state.user = newValue
         },
@@ -25,6 +28,10 @@ export default new Vuex.Store({
                 resolve(user)
             })
         },
+        bindUserData: firebaseAction(({ state, bindFirebaseRef }) => {
+            const dbRef = firebase.database().ref(`/users/${state.user.uid}`)
+            return bindFirebaseRef('userData', dbRef)
+        }),
         doSocialSignIn: ({commit, dispatch}, using) => {
             return new Promise(((resolve, reject) => {
                 let provider

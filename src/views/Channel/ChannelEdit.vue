@@ -1,7 +1,9 @@
 <template>
     <div class="text-center space-y-2">
         <h3 v-if="channel">{{ channel[channelKey].channelName }}</h3>
-
+        <div>
+            <Button :pressed="this.isSubscribed(channelKey)" @click="handleSubscribe(channelKey)">Subscribe{{ this.isSubscribed(channelKey) ? 'd' : '' }}</Button>
+        </div>
         <div class="space-y-2 pt-4">
             <span class="font-medium" v-if="upcomingTasks.length > 0">Upcoming tasks:</span>
             <div class="flex flex-col items-center" v-for="task in upcomingTasks" :key="task['.key']">
@@ -35,9 +37,10 @@
     import moment from "moment"
     import { CalendarIcon, PlusIcon } from 'vue-feather-icons'
     import FloatingActionButton from "../../components/FloatingActionButton";
+    import Button from "../../components/Button";
     export default {
         name: "ChannelEdit",
-        components: {FloatingActionButton, Card, CalendarIcon, PlusIcon},
+        components: {Button, FloatingActionButton, Card, CalendarIcon, PlusIcon},
         data() {
             return {
                 channel: {},
@@ -66,6 +69,9 @@
             user() {
                 return this.$store.state.user
             },
+            userData() {
+                return this.$store.state.userData
+            },
         },
         mounted() {
             if (!parseInt(this.$route.params.id)) {
@@ -75,6 +81,9 @@
 
                 // get current user
                 this.$store.dispatch('getAuthenticatedUser')
+
+                // bind user data
+                this.$store.dispatch('bindUserData')
             }
         },
         methods: {
@@ -101,6 +110,28 @@
             },
             gotoTask(taskKey) {
                 this.$router.push(`/channels/${this.channelId}/task/${taskKey}`)
+            },
+            isSubscribed(channelKey) {
+                const subscribedChannels = this.userData['subscribedChannels']
+                return subscribedChannels ? subscribedChannels.includes(channelKey) : false
+            },
+            handleSubscribe(channelKey) {
+                if (this.isSubscribed(channelKey)) this.doUnsubscribe(channelKey)
+                else this.doSubscribe(channelKey)
+            },
+            doSubscribe(channelKey) {
+                const subscribedChannels = this.userData['subscribedChannels']
+                subscribedChannels.push(channelKey)
+                const dbRef = this.$firebase.database().ref(`/users/${this.user.uid}/subscribedChannels`)
+                dbRef.set(subscribedChannels)
+            },
+            doUnsubscribe(channelKey) {
+                const subscribedChannels = this.userData['subscribedChannels']
+                const index = subscribedChannels.findIndex(key => key === channelKey)
+                // dont remove array directly, use splice instead
+                subscribedChannels.splice(index, index);
+                const dbRef = this.$firebase.database().ref(`/users/${this.user.uid}/subscribedChannels`)
+                dbRef.set(subscribedChannels)
             }
         },
         filters: {
@@ -114,7 +145,7 @@
             },
             channel() {
                 this.populateTasks()
-            }
+            },
         },
     }
 </script>

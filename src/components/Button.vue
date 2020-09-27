@@ -4,8 +4,12 @@
             v-bind="$attrs"
             :class="{
                 primary : this.primary,
-                dark : this.dark
+                dark : this.dark,
+                clickable : !this.disabled,
+                disabled : this.disabled,
+                pressed : this.pressed,
             }"
+            :disabled="disabled"
             @click="handleClick()">
         <div class="button-content">
             <img v-if="iconSrc" :class="iconClass" :src="iconSrc" class="icon">
@@ -18,6 +22,14 @@
     export default {
         name: "Button",
         props: {
+            disabled: {
+                type: Boolean,
+                default: false
+            },
+            pressed: {
+                type: Boolean,
+                default: false
+            },
             primary: {
                 type: Boolean,
                 default: false
@@ -45,23 +57,39 @@
 
 <style scoped>
     .button {
-        @apply py-2 px-4 bg-white shadow-lg rounded-full font-display font-bold transition ease-in-out duration-200 border-solid border border-gray-300;
+        @apply py-2 px-4 bg-white rounded-full font-display font-bold transition ease-in-out duration-200 border-solid border border-gray-300;
     }
 
     .primary {
         @apply bg-primary text-white border-primary-700;
     }
 
-    .button:active {
-        @apply transform scale-95 shadow-none;
+    .clickable {
+        @apply shadow-lg
     }
 
-    .button:hover {
+    .clickable:hover {
         @apply bg-gray-200;
     }
 
-    .primary:hover {
+    .clickable.primary:hover {
         @apply bg-primary-500;
+    }
+
+    .clickable:active {
+        @apply transform scale-95 shadow-none;
+    }
+
+    .pressed {
+        @apply bg-gray-300 text-gray-500 border-gray-300
+    }
+
+    .pressed:hover {
+        @apply bg-gray-300 !important
+    }
+
+    .disabled {
+        @apply pressed
     }
 
     .icon {
