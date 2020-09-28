@@ -1,6 +1,6 @@
 <template>
     <div class="text-center space-y-2">
-        <h3 v-if="channel">{{ channel[channelKey].channelName }}</h3>
+        <h3 v-if="channel[channelKey]">{{ channel[channelKey].channelName }}</h3>
         <div>
             <Button :pressed="this.isSubscribed(channelKey)" @click="handleSubscribe(channelKey)">Subscribe{{ this.isSubscribed(channelKey) ? 'd' : '' }}</Button>
         </div>
@@ -112,7 +112,7 @@
                 this.$router.push(`/channels/${this.channelId}/task/${taskKey}`)
             },
             isSubscribed(channelKey) {
-                const subscribedChannels = this.userData['subscribedChannels']
+                const subscribedChannels = this.userData ? this.userData['subscribedChannels'] || [] : [] // check if null
                 return subscribedChannels ? subscribedChannels.includes(channelKey) : false
             },
             handleSubscribe(channelKey) {
@@ -120,13 +120,13 @@
                 else this.doSubscribe(channelKey)
             },
             doSubscribe(channelKey) {
-                const subscribedChannels = this.userData['subscribedChannels']
+                const subscribedChannels = this.userData ? this.userData['subscribedChannels'] || [] : [] // check if null
                 subscribedChannels.push(channelKey)
                 const dbRef = this.$firebase.database().ref(`/users/${this.user.uid}/subscribedChannels`)
                 dbRef.set(subscribedChannels)
             },
             doUnsubscribe(channelKey) {
-                const subscribedChannels = this.userData['subscribedChannels']
+                const subscribedChannels = this.userData ? this.userData['subscribedChannels'] || [] : [] // check if null
                 const index = subscribedChannels.findIndex(key => key === channelKey)
                 // dont remove array directly, use splice instead
                 subscribedChannels.splice(index, 1);
