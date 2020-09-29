@@ -4,7 +4,7 @@
             <h1 v-if="user">Hello, {{ user.displayName }}!</h1>
 
             <div class="flex flex-col space-y-4 space-x-0 xl:flex-row xl:justify-between xl:space-x-4 xl:space-y-0">
-                <user-tasks-widget class="widget w-full" v-if="this.tasksList.length > 0" :tasks-list="this.tasksList"/>
+                <user-tasks-widget class="widget w-full" v-if="this.tasksList.length > 0" :tasks-list="this.tasksList" @click="handleTaskClick"/>
             </div>
         </div>
     </div>
@@ -62,6 +62,9 @@
                         }
                     })
                 }
+            },
+            handleTaskClick(task) {
+                this.$router.push(`/channels/${task.channelId}/task/${task.taskKey}`)
             }
         }
     }

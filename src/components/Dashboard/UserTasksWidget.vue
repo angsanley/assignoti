@@ -6,13 +6,15 @@
                 <div v-for="task in sortedTasksList" :key="task['.key']" class="item">
                     <div class="flex space-x-4">
                         <div>
-                            <input type="checkbox"/>
+                            <input type="checkbox" @change="handleCheckbox($event, channels[task.channelKey].id, task['.key'])"/>
                         </div>
-                        <div class="flex flex-col truncate">
-                            <div class="text-sm" v-if="channels[task.channelKey]">{{ channels[task.channelKey].channelName }}</div>
-                            <div class="font-display font-bold">{{ task.name }}</div>
-                            <div class="text-sm">{{ task.deadlineDate | timeFromNow }}</div>
-                        </div>
+                        <button class="text-left w-full" @click="handleClick(channels[task.channelKey].id, task['.key'])">
+                            <div class="flex flex-col truncate">
+                                <div class="text-sm" v-if="channels[task.channelKey]">{{ channels[task.channelKey].channelName }}</div>
+                                <div class="font-display font-bold">{{ task.name }}</div>
+                                <div class="text-sm">{{ task.deadlineDate | timeFromNow }}</div>
+                            </div>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -36,6 +38,14 @@
         filters: {
             timeFromNow(date) {
                 return moment(date).fromNow()
+            }
+        },
+        methods: {
+            handleClick(channelId, taskKey) {
+                this.$emit('click',  {channelId, taskKey})
+            },
+            handleCheckbox(event, channelId, taskKey) {
+                console.log({value: event.target.checked, channelId, taskKey})
             }
         },
         mounted() {
