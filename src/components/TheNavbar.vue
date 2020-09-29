@@ -37,7 +37,7 @@
 
 <style scoped>
     .navbar {
-        @apply shadow-lg w-full h-16 flex flex-col justify-center bg-white mb-6
+        @apply shadow-lg w-full h-16 flex flex-col justify-center bg-white
     }
 
     .inner {

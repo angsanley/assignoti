@@ -5,7 +5,7 @@
         </div>
         <div class="content">
             <the-navbar/>
-            <router-view/>
+            <div class="h-full pt-6 overflow-y-scroll"><router-view/></div>
         </div>
     </div>
 </template>
@@ -37,6 +37,9 @@
 </script>
 
 <style scoped>
+    .content {
+        @apply h-screen overflow-hidden
+    }
     .sidebar {
         @apply h-screen w-64 fixed transition ease-out duration-300 left-0 top-0 z-30;
     }
