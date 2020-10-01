@@ -16,7 +16,7 @@
                     </Card>
                     <Card class="m-2 p-2 space-y-2">
                         <div class="card-title">Discussions</div>
-                        <div class="flex flex-row items-center w-full my-1"
+                        <div class="flex flex-row w-full my-1"
                             v-for="({ timestamp, author, content }, i) in discussions" 
                             :key="`#post-${timestamp}-${i}`"
                         >
@@ -24,7 +24,7 @@
                                 class="w-8 h-8 rounded-full flex-shrink-0"
                                 :src="participatingUsers[author].photoURL" 
                             />
-                            <div class="ml-2 leading-tight">
+                            <div class="ml-2 self-center leading-tight">
                                 <span class="font-display font-bold">
                                     {{ participatingUsers[author].displayName }}
                                 </span>
