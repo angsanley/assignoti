@@ -16,11 +16,23 @@
                     </Card>
                     <Card class="m-2 p-2 space-y-2">
                         <div class="card-title">Discussions</div>
-                        <div class="w-full"
+                        <div class="flex flex-row items-center w-full my-1"
                             v-for="({ timestamp, author, content }, i) in discussions" 
                             :key="`#post-${timestamp}-${i}`"
                         >
-
+                            <img 
+                                class="w-8 h-8 rounded-full flex-shrink-0"
+                                :src="participatingUsers[author].photoURL" 
+                            />
+                            <div class="ml-2 leading-tight">
+                                <span class="font-display font-bold">
+                                    {{ participatingUsers[author].displayName }}
+                                </span>
+                                {{content}}
+                                <span class="font-light text-xs">
+                                    {{ timestamp | relativeDateFormat }}
+                                </span>
+                            </div>
                         </div>
                         <Input 
                             v-model="discussionContent"
@@ -63,6 +75,7 @@
                     authorName: ''
                 },
                 discussions: [],
+                participatingUsers: {}, // users participating in discussion
                 channel: {},
                 channelId: 0,
                 discussionContent: '',
@@ -129,6 +142,9 @@
         filters: {
             dateFormat(date) {
                 return moment(date).format("MMM Do YYYY")
+            },
+            relativeDateFormat(date) {
+                return moment(date).fromNow()
             }
         },
         mounted() {
@@ -173,6 +189,13 @@
             },
             firebaseDiscussionData(val) {
                 this.discussions = Object.values(val)
+                Object.values(val).forEach(({ author }) => {
+                    // check if user data has been fetched
+                    !this.participatingUsers[author] && this.$firebase.database().ref(`users/${author}`).once('value')
+                        .then(snapshot => {
+                            this.$set(this.participatingUsers, author, snapshot.val())
+                        })
+                })
             }
         }
     }
