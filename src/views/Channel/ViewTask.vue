@@ -5,14 +5,36 @@
                 <Card class="lg:w-2/4 m-2 p-2 break-words">
                     <vue-markdown :source="task.description"/>
                 </Card>
-                <Card class="lg:w-2/4 m-2 p-2 space-y-2">
-                    <div class="font-bold font-display break-words text-xl">{{ task.name }}</div>
-                    <div>
-                        <div class="flex items-center space-x-2"><BookIcon size="1x"/> <div>{{ channel[channelKey]['channelName'] }}</div></div>
-                        <div class="flex items-center space-x-2"><CalendarIcon size="1x"/> <div>{{ task.deadlineDate | dateFormat }}</div></div>
-                        <div class="flex items-center space-x-2"><UserIcon size="1x"/> <div>Posted by {{ task.authorName }}</div></div>
-                    </div>
-                </Card>
+                <div class="flex flex-col lg:w-2/4">
+                    <Card class="m-2 p-2 space-y-2">
+                        <div class="card-title">{{ task.name }}</div>
+                        <div>
+                            <div class="flex items-center space-x-2"><BookIcon size="1x"/> <div>{{ channel[channelKey]['channelName'] }}</div></div>
+                            <div class="flex items-center space-x-2"><CalendarIcon size="1x"/> <div>{{ task.deadlineDate | dateFormat }}</div></div>
+                            <div class="flex items-center space-x-2"><UserIcon size="1x"/> <div>Posted by {{ task.authorName }}</div></div>
+                        </div>
+                    </Card>
+                    <Card class="m-2 p-2 space-y-2">
+                        <div class="card-title">Discussions</div>
+                        <div class="w-full"
+                            v-for="({ timestamp, author, content }, i) in discussions" 
+                            :key="`#post-${timestamp}-${i}`"
+                        >
+
+                        </div>
+                        <Input 
+                            v-model="discussionContent"
+                            name="task-name" 
+                            id="task-name" 
+                            type="text" 
+                            placeholder="Got anything in your mind?" 
+                            :textarea="true"  
+                        />
+                        <Button @click="makePost()" class="pt-4 w-full" primary>
+                            <span class="text-center w-full">Post</span>
+                        </Button>
+                    </Card>
+                </div>
             </div>
         </div>
 
@@ -21,15 +43,17 @@
 </template>
 
 <script>
-    import moment from "moment";
-    import VueMarkdown from "vue-markdown";
-    import Card from "../../components/Card";
+    import moment from "moment"
+    import VueMarkdown from "vue-markdown"
+    import Card from "../../components/Card"
     import { CalendarIcon, BookIcon, UserIcon, EditIcon } from 'vue-feather-icons'
-    import FloatingActionButton from "../../components/FloatingActionButton";
+    import FloatingActionButton from "../../components/FloatingActionButton"
+    import Button from '@/components/Button'
+    import Input from '@/components/Input'
 
     export default {
         name: "ViewTask",
-        components: {FloatingActionButton, Card, VueMarkdown, CalendarIcon, BookIcon, UserIcon, EditIcon},
+        components: {FloatingActionButton, Card, VueMarkdown, CalendarIcon, BookIcon, UserIcon, EditIcon, Input, Button},
         data() {
             return {
                 task: {
@@ -38,11 +62,14 @@
                     description: '',
                     authorName: ''
                 },
+                discussions: [],
                 channel: {},
                 channelId: 0,
+                discussionContent: '',
                 taskKey: null,
                 firebaseTaskData: null,
-                firebaseAuthorData: null
+                firebaseAuthorData: null,
+                firebaseDiscussionData: null
             }
         },
         computed: {
@@ -51,7 +78,7 @@
             },
             user() {
                 return this.$store.state.user
-            },
+            }
         },
         methods: {
             bindChannel(channelId) {
@@ -66,6 +93,11 @@
                 const dbRef = db.ref(`channels/${channelKey}/tasks/${taskKey}`)
                 this.$rtdbBind('firebaseTaskData', dbRef)
             },
+            bindDiscussion(channelKey, taskKey) {
+                const db = this.$firebase.database()
+                const dbRef = db.ref(`channels/${channelKey}/tasks/${taskKey}/discussions`)
+                this.$rtdbBind('firebaseDiscussionData', dbRef)
+            },
             gotoEditTask() {
                 this.$router.push(`/channels/${this.channelId}/task/${this.taskKey}/edit`)
             },
@@ -73,6 +105,25 @@
                 const db = this.$firebase.database()
                 const dbRef = db.ref(`users/${authorUid}`)
                 this.$rtdbBind('firebaseAuthorData', dbRef)
+            },
+            makePost() {
+                const db = this.$firebase.database()
+                const dbRef = db.ref(`channels/${this.channelKey}/tasks/${this.taskKey}/discussions`)
+
+                const dataToPush = {
+                    author: this.$firebase.auth().currentUser.uid,
+                    timestamp: (new Date()).toISOString(),
+                    content: this.discussionContent
+                };
+
+                dbRef.push(dataToPush)
+                    .then(() => {
+                        this.discussionContent = ''
+                    })
+                    .catch(e => {
+                        alert('ngeri')
+                        console.log(e.message)
+                    })
             }
         },
         filters: {
@@ -100,13 +151,16 @@
                 this.bindChannel(val)
             },
             channel() {
-                if (this.taskKey) this.bindTask(this.channelKey, this.taskKey)
+                if (this.taskKey) {
+                    this.bindTask(this.channelKey, this.taskKey)
+                    this.bindDiscussion(this.channelKey, this.taskKey)
+                }
             },
             form() {
                 console.log(this.form.deadline)
             },
             firebaseTaskData(val) {
-                // update form data with firebase data
+                // update form data with firebase 
                 this.task.name = val.name
                 this.task.deadline = new Date(val.deadlineDate)
                 this.task.description = val.description
@@ -116,11 +170,16 @@
             },
             firebaseAuthorData(val) {
                 this.task.authorName = val.displayName
+            },
+            firebaseDiscussionData(val) {
+                this.discussions = Object.values(val)
             }
         }
     }
 </script>
 
 <style scoped>
-
+    .card-title {
+        @apply font-bold font-display break-words text-xl;
+    }
 </style>
