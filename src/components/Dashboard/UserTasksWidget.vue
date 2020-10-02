@@ -8,13 +8,18 @@
                         <div>
                             <input type="checkbox" @change="handleCheckbox($event, channels[task.channelKey].id, task['.key'])"/>
                         </div>
-                        <button class="text-left w-full" @click="handleClick(channels[task.channelKey].id, task['.key'])">
-                            <div class="flex flex-col truncate">
-                                <div class="text-sm" v-if="channels[task.channelKey]">{{ channels[task.channelKey].channelName }}</div>
-                                <div class="font-display font-bold">{{ task.name }}</div>
-                                <div class="text-sm">{{ task.deadlineDate | timeFromNow }}</div>
-                            </div>
-                        </button>
+                        <div>
+                            <router-link v-if="channels[task.channelKey]" class="text-sm" :to="`/dashboard/channels/${channels[task.channelKey].id}`">
+                                {{ channels[task.channelKey].channelName }}
+                            </router-link>
+
+                            <button class="text-left w-full" @click="handleClick(channels[task.channelKey].id, task['.key'])">
+                                <div class="flex flex-col truncate">
+                                    <div class="font-display font-bold">{{ task.name }}</div>
+                                    <div class="text-sm">Due {{ task.deadlineDate | timeFromNow }}</div>
+                                </div>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
