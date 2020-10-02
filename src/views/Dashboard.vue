@@ -38,6 +38,11 @@
             hideSidebar() {
                 this.$store.dispatch('hideSidebar')
             }
+        },
+        watch: {
+            '$route' () {
+                this.hideSidebar()
+            }
         }
     }
 </script>
