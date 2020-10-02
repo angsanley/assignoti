@@ -1,26 +1,21 @@
 <template>
     <div>
         <Card class="flex flex-col space-y-4 mt-2 h-full">
-            <div>Upcoming tasks</div>
-            <div class="flex flex-col space-y-2 overflow-y-auto">
-                <div v-for="task in sortedTasksList" :key="task['.key']" class="item">
-                    <div class="flex space-x-4">
-                        <div>
-                            <input type="checkbox" @change="handleCheckbox($event, channels[task.channelKey].id, task['.key'])"/>
-                        </div>
-                        <div>
-                            <router-link v-if="channels[task.channelKey]" class="text-sm" :to="`/dashboard/channels/${channels[task.channelKey].id}`">
-                                {{ channels[task.channelKey].channelName }}
-                            </router-link>
+            <div class="flex space-x-4">
+                <button :class="{'active-tab': currentTab === 'upcoming'}" class="text-sm" @click="upcomingTab">Upcoming tasks</button>
+                <button :class="{'active-tab': currentTab === 'done'}" class="text-sm" @click="doneTab">Tasks done</button>
+            </div>
+            <div class="flex flex-col overflow-y-auto overflow-x-hidden h-full">
+                <div v-if="currentTab === 'upcoming'" class="h-full">
+                    <div class="grid place-items-center h-full text-center" v-if="sortedTasksList.length <= 0">Yay! No upcoming tasks yet.</div>
 
-                            <button class="text-left w-full" @click="handleClick(channels[task.channelKey].id, task['.key'])">
-                                <div class="flex flex-col truncate">
-                                    <div class="font-display font-bold">{{ task.name }}</div>
-                                    <div class="text-sm">Due {{ task.deadlineDate | timeFromNow }}</div>
-                                </div>
-                            </button>
-                        </div>
-                    </div>
+                    <TasksList :tasks-list="sortedTasksList" :channels="channels" :click="handleClick" v-on:check="handleCheckbox"/>
+
+                </div>
+                <div v-else class="h-full">
+                    <div class="grid place-items-center h-full text-center" v-if="sortedDoneTasksList.length <= 0">Hey! You haven't done any tasks yet. Let's do some tasks, shall we?</div>
+
+                    <TasksList :tasks-list="sortedDoneTasksList" :channels="channels" :click="handleClick" v-on:check="handleCheckbox"/>
                 </div>
             </div>
         </Card>
@@ -31,13 +26,19 @@
     import moment from "moment"
     import Card from "../Card";
     import firebase from "firebase";
+    import TasksList from "./UserTasksWidget/TasksList";
     export default {
         name: "UserTasksWidget",
-        components: {Card},
+        components: {TasksList, Card},
         props: ['tasksList'],
         data() {
             return {
-                channels: {}
+                channels: {},
+                currentTab: 'upcoming',
+                tasks: {
+                    upcoming: [],
+                    done: []
+                }
             }
         },
         filters: {
@@ -46,23 +47,78 @@
             }
         },
         methods: {
-            handleClick(channelId, taskKey) {
+            handleClick({channelId, taskKey}) {
+                console.log({channelId, taskKey})
                 this.$emit('click',  {channelId, taskKey})
             },
-            handleCheckbox(event, channelId, taskKey) {
-                console.log({value: event.target.checked, channelId, taskKey})
+            handleCheckbox({checked, channelId, taskKey}) {
+                // get channel key from channel id
+                const dbRef = this.$firebase.database().ref('channels')
+                dbRef.orderByChild('id').equalTo(channelId).limitToFirst(1).once('value').then(snapshot => {
+                    const key = Object.keys(snapshot.val())[0]
+                    const userId = this.user.uid
+
+                    const taskUsersDoneRef = this.$firebase.database().ref(`channels/${key}/tasks/${taskKey}/usersDone/${userId}`)
+                    if (checked) {
+                        // set task as done
+                        taskUsersDoneRef.set({
+                            done: true,
+                            dateDone: new Date().toISOString()
+                        })
+                    } else {
+                        taskUsersDoneRef.set(null)
+                    }
+                })
+            },
+            upcomingTab() {
+                this.currentTab = 'upcoming'
+            },
+            doneTab() {
+                this.currentTab = 'done'
             }
         },
         mounted() {
         },
         computed: {
             sortedTasksList() {
-                let sorted = this.tasksList
+                let sorted = this.tasks.upcoming
                 sorted.sort((a, b) => {
                     return new Date(a.deadlineDate) - new Date(b.deadlineDate)
                 })
                 return sorted
+            },
+            sortedDoneTasksList() {
+                let sorted = this.tasks.done
+                sorted.sort((a, b) => {
+                    return new Date(a.deadlineDate) - new Date(b.deadlineDate)
+                })
+                return sorted
+            },
+            user() {
+                return this.$store.state.user
             }
+        },
+        watch: {
+          tasksList(val) {
+              this.tasks.upcoming = []
+              this.tasks.done = []
+
+              for (let x=0; x<val.length; ++x) {
+                  const task = val[x]
+                  if (task['usersDone']) {
+                      if (task['usersDone'][this.user.uid].done) {
+                          // task done
+                          this.tasks.done.push(task)
+                      } else {
+                          // task haven't done
+                          this.tasks.upcoming.push(task)
+                      }
+                  } else {
+                      // task haven't done
+                      this.tasks.upcoming.push(task)
+                  }
+              }
+          }
         },
         firebase: {
             //TODO: do not fetch all channels, this is not a good idea
@@ -78,5 +134,9 @@
 
     .item:hover {
         @apply transform bg-gray-400
+    }
+
+    .active-tab {
+        @apply font-bold
     }
 </style>
