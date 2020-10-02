@@ -9,13 +9,13 @@
                 <div v-if="currentTab === 'upcoming'" class="h-full">
                     <div class="grid place-items-center h-full text-center" v-if="sortedTasksList.length <= 0">Yay! No upcoming tasks yet.</div>
 
-                    <TasksList :tasks-list="sortedTasksList" :channels="channels" :click="handleClick" v-on:check="handleCheckbox"/>
+                    <TasksList :tasks-list="sortedTasksList" :channels="channels" v-on:click="handleClick" v-on:check="handleCheckbox"/>
 
                 </div>
                 <div v-else class="h-full">
                     <div class="grid place-items-center h-full text-center" v-if="sortedDoneTasksList.length <= 0">Hey! You haven't done any tasks yet. Let's do some tasks, shall we?</div>
 
-                    <TasksList :tasks-list="sortedDoneTasksList" :channels="channels" :click="handleClick" v-on:check="handleCheckbox"/>
+                    <TasksList :tasks-list="sortedDoneTasksList" :channels="channels" v-on:click="handleClick" v-on:check="handleCheckbox"/>
                 </div>
             </div>
         </Card>
