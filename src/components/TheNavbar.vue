@@ -1,5 +1,5 @@
 <template>
-    <div class="navbar" v-click-outside="closeUserCard">
+    <div class="navbar">
         <div class="inner space-x-2">
             <div class="mobile-items space-x-2">
                 <button @click="openSidebar()" class="toggle-sidebar"><MenuIcon/></button>
@@ -7,16 +7,15 @@
             <div>
                 <h4>Assignoti</h4>
             </div>
-            <button v-if="this.userObj" @click.prevent="toggleUserCard"><img class="user-profile" :src="userObj.photoURL" alt="profile"/></button>
-            <!-- <a href="#" @click="toggleUserCard()" ><img class="account-pic h-10 w-10" :src="userObj.photoURL" alt="profile picture"/></a> -->
+            <button v-if="this.userObj" @click="toggleUserCard"><img class="user-profile" :src="userObj.photoURL" alt="profile"/></button>
         </div>
 
         <transition name="fade">
-            <div class="user-card" v-if="showUserCard">
-                <div class="flex flex-col items-center">
-                    <img class="account-pic h-24 w-24" :src="userObj.photoURL" alt="profile picture"/>
-                    <div class="text-sm mt-2 dark-mode:text-gray-400">{{userObj.displayName }}</div>
-                    <a href="#" @click.prevent="logout" class="border-2 rounded-full w-full py-1 mt-4 text-center text-gray-700 dark-mode:text-gray-400 no-underline hover:bg-gray-100 dark-mode:hover:bg-gray-800 focus:outline-none">Logout</a>
+            <div class="user-card" v-if="showUserCard" v-on-clickaway="closeUserCard">
+                <div class="flex flex-col items-center space-y-2">
+                    <img class="h-20 w-20 rounded-full" :src="userObj.photoURL" alt="profile picture"/>
+                    <div class="font-display font-bold text-lg">{{ userObj.displayName }}</div>
+                    <a href="#" @click.prevent="logout" class="border-2 rounded-full py-1 w-full text-center text-gray-700 no-underline hover:bg-gray-100 focus:outline-none">Logout</a>
                 </div>
             </div>
         </transition>
@@ -25,6 +24,7 @@
 
 <script>
     import { MenuIcon } from "vue-feather-icons"
+    import {mixin as clickaway} from "vue-clickaway";
     export default {
         name: "TheNavbar",
         data() {
@@ -34,6 +34,7 @@
             }
         },
         components: { MenuIcon },
+        mixins: [ clickaway ],
         methods: {
             openSidebar() {
                 setTimeout( () => {
@@ -47,14 +48,10 @@
                 this.showUserCard = false;
             },
             logout() {
-                this.$store.dispatch('clearAll');
-                this.$router.push('/login');
+                this.$store.dispatch('doSignOut').then(() => {
+                    this.$router.push('/login')
+                })
             },
-            // async getPhoto() {
-            //     const GeneralRepository = RepositoryFactory.get('general');
-            //     const response = await GeneralRepository.getPhoto();
-            //     this.profilePicture = `data:image/png;base64,${response.data['photo']}`;
-            // }
         },
         computed: {
             userObj() {
@@ -104,7 +101,7 @@
     }
 
     .user-card {
-        @apply bg-white rounded-lg shadow-xl fixed px-4 py-6 mt-16 mr-6 top-0 right-0;
+        @apply bg-white rounded-lg shadow-xl fixed px-4 py-4 mt-16 mr-4 top-0 right-0;
     }
 
     @screen lg {
