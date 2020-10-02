@@ -61,12 +61,38 @@
                     const taskUsersDoneRef = this.$firebase.database().ref(`channels/${key}/tasks/${taskKey}/usersDone/${userId}`)
                     if (checked) {
                         // set task as done
-                        taskUsersDoneRef.set({
+                        const taskDone = {
                             done: true,
                             dateDone: new Date().toISOString()
-                        })
+                        }
+                        taskUsersDoneRef.set(taskDone)
+
+                        // move task to done
+                        for (let x=0; x<this.tasks.upcoming.length; ++x) {
+                            let task = this.tasks.upcoming[x]
+                            if (task['.key'] === taskKey) {
+                                task.usersDone = task.usersDone ? task.usersDone : {}
+                                task.usersDone[userId] = taskDone
+
+                                this.tasks.done.push(task)
+                                this.tasks.upcoming.splice(x, 1)
+                                return
+                            }
+                        }
+
                     } else {
                         taskUsersDoneRef.set(null)
+
+                        // move task to upcoming
+                        for (let x=0; x<this.tasks.done.length; ++x) {
+                            let task = this.tasks.done[x]
+                            if (task['.key'] === taskKey) {
+                                delete task.usersDone[userId]
+                                this.tasks.upcoming.push(task)
+                                this.tasks.done.splice(x, 1)
+                                return
+                            }
+                        }
                     }
                 })
             },
@@ -75,6 +101,21 @@
             },
             doneTab() {
                 this.currentTab = 'done'
+            },
+            checkTaskDone(task) {
+                if (task) {
+                    if (task.usersDone) {
+                        if (task.usersDone[this.user.uid]) {
+                            return task.usersDone[this.user.uid].done
+                        } else {
+                            return false
+                        }
+                    } else {
+                        return false
+                    }
+                } else {
+                    return false
+                }
             }
         },
         mounted() {
@@ -105,16 +146,9 @@
 
               for (let x=0; x<val.length; ++x) {
                   const task = val[x]
-                  if (task['usersDone']) {
-                      if (task['usersDone'][this.user.uid].done) {
-                          // task done
-                          this.tasks.done.push(task)
-                      } else {
-                          // task haven't done
-                          this.tasks.upcoming.push(task)
-                      }
+                  if (this.checkTaskDone(task)) {
+                      this.tasks.done.push(task)
                   } else {
-                      // task haven't done
                       this.tasks.upcoming.push(task)
                   }
               }

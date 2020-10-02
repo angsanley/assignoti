@@ -3,7 +3,7 @@
         <div v-for="task in tasksList" :key="task['.key']" class="item">
             <div class="flex space-x-4">
                 <div>
-                    <input :checked="task['usersDone'] ? task['usersDone'][user.uid].done : false" type="checkbox" @change="handleCheckbox($event, channels[task.channelKey].id, task['.key'])"/>
+                    <input :checked="checkTaskDone(task)" type="checkbox" @change="handleCheckbox($event, channels[task.channelKey].id, task['.key'])"/>
                 </div>
                 <div>
                     <router-link v-if="channels[task.channelKey]" class="text-sm" :to="`/dashboard/channels/${channels[task.channelKey].id}`">
@@ -13,7 +13,7 @@
                     <button class="text-left w-full" @click="handleClick(channels[task.channelKey].id, task['.key'])">
                         <div class="flex flex-col truncate">
                             <div class="font-display font-bold">{{ task.name }}</div>
-                            <div class="text-sm" v-if="task['usersDone'] ? task['usersDone'][user.uid].done : false">Done {{ task.deadlineDate | timeFromNow }}</div>
+                            <div class="text-sm" v-if="checkTaskDone(task)">Done {{ task.deadlineDate | timeFromNow }}</div>
                             <div class="text-sm" v-else>Due {{ task.deadlineDate | timeFromNow }}</div>
                         </div>
                     </button>
@@ -35,6 +35,21 @@
             },
             handleCheckbox(event, channelId, taskKey) {
                 this.$emit('check',  {checked: event.target.checked, channelId, taskKey})
+            },
+            checkTaskDone(task) {
+                if (task) {
+                    if (task.usersDone) {
+                        if (task.usersDone[this.user.uid]) {
+                            return task.usersDone[this.user.uid].done
+                        } else {
+                            return false
+                        }
+                    } else {
+                        return false
+                    }
+                } else {
+                    return false
+                }
             }
         },
         computed: {
