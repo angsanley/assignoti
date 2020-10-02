@@ -67,6 +67,17 @@ exports.lineWebhookHandler = functions.https.onRequest((req, res) => {
                     functions.logger.error(e)
                     res.send('Not OK')
                 })
+            case '/userid':
+                return sendReply(replyToken, [{
+                    "type": "text",
+                    "text": event.source.userId
+                }]).then(() => {
+                    functions.logger.info('Sent reply to LINE')
+                    res.send('OK')
+                }).catch(e => {
+                    functions.logger.error(e)
+                    res.send('Not OK')
+                })
             default:
                 res.send('Unknown message')
                 break
