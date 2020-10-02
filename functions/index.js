@@ -106,7 +106,7 @@ function sendMessageToLine(id, message) {
 
 exports.newTaskHandler = functions.database.ref('channels/{channelKey}/tasks/{taskKey}')
     .onCreate( (snapshot, context) => {
-        Date.prototype.addHours = hours => {
+        Date.prototype.addHours = function (hours) {
             this.setHours(this.getHours() + hours)
             return this
         }
