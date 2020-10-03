@@ -30,18 +30,30 @@ exports.lineWebhookHandler = functions.https.onRequest((req, res) => {
         const replyToken = event.replyToken
         functions.logger.info(event)
 
-        const messages = [{
-            "type": "text",
-            "text": event.message.text
-        }]
-
-        return sendReply(replyToken, messages).then(() => {
-            functions.logger.info('Sent reply to LINE')
-            res.send('OK')
-        }).catch(e => {
-            functions.logger.error(e)
-            res.send('Not OK')
-        })
+        switch (event.message.text) {
+            case '/getid':
+                return sendReply(replyToken, [{
+                    "type": "text",
+                    "text": JSON.stringify(event.source)
+                }]).then(() => {
+                    functions.logger.info('Sent reply to LINE')
+                    res.send('OK')
+                }).catch(e => {
+                    functions.logger.error(e)
+                    res.send('Not OK')
+                })
+            default:
+                return sendReply(replyToken, [{
+                    "type": "text",
+                    "text": "ngomong opo toh?"
+                }]).then(() => {
+                    functions.logger.info('Sent reply to LINE')
+                    res.send('OK')
+                }).catch(e => {
+                    functions.logger.error(e)
+                    res.send('Not OK')
+                })
+        }
 
     }
 
@@ -50,27 +62,10 @@ exports.lineWebhookHandler = functions.https.onRequest((req, res) => {
         functions.logger.info(event)
 
         switch (event.message.text) {
-            case 'amt jelek':
-                const messages = [{
-                    "type": "image",
-                    originalContentUrl: 'https://i.postimg.cc/YqqpgVct/download.jpg',
-                    previewImageUrl: 'https://i.postimg.cc/YqqpgVct/download.jpg',
-                }, {
-                    "type": "text",
-                    "text": 'Saya setuju'
-                }]
-
-                return sendReply(replyToken, messages).then(() => {
-                    functions.logger.info('Sent reply to LINE')
-                    res.send('OK')
-                }).catch(e => {
-                    functions.logger.error(e)
-                    res.send('Not OK')
-                })
-            case '/userid':
+            case '/getid':
                 return sendReply(replyToken, [{
                     "type": "text",
-                    "text": event.source.userId
+                    "text": JSON.stringify(event.source)
                 }]).then(() => {
                     functions.logger.info('Sent reply to LINE')
                     res.send('OK')
