@@ -68,7 +68,7 @@
         },
         watch: {
             subscriptionsArray(newVal) {
-                this.loadSubscriptionsData(newVal)
+                if (newVal) this.loadSubscriptionsData(newVal)
             }
         }
     }
