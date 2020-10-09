@@ -94,7 +94,7 @@
                 }
 
                 dbRef.update(pushData).then(() => {
-                    this.$router.push(`/channels/${this.channelId}/task/${this.taskKey}`)
+                    this.$router.push(`/dashboard/channels/${this.channelId}/task/${this.taskKey}`)
                 }).catch(e => {
                     alert('error')
                     console.log(e.message)
@@ -115,7 +115,7 @@
                 }
 
                 dbRef.push(pushData).then(() => {
-                    this.$router.push(`/channels/${this.channelId}`)
+                    this.$router.push(`/dashboard/channels/${this.channelId}`)
                 }).catch(e => {
                     alert('error')
                     console.log(e.message)
@@ -127,7 +127,7 @@
                     const dbRef = db.ref(`tasks/${this.taskKey}`)
 
                     dbRef.remove().then(() => {
-                        this.$router.push(`/channels/${this.channelId}`)
+                        this.$router.push(`/dashboard/channels/${this.channelId}`)
                     }).catch(e => {
                         alert('error')
                         console.log(e.message)

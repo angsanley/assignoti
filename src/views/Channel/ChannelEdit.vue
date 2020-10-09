@@ -105,10 +105,10 @@
                 })
             },
             addNewTask() {
-                this.$router.push(`/channels/${this.channelId}/task/new`)
+                this.$router.push(`/dashboard/channels/${this.channelId}/task/new`)
             },
             gotoTask(taskKey) {
-                this.$router.push(`/channels/${this.channelId}/task/${taskKey}`)
+                this.$router.push(`${this.$route.path}/task/${taskKey}`)
             },
             isSubscribed(channelKey) {
                 if (this.subscriptions) {

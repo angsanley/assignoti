@@ -112,7 +112,7 @@
                 this.$rtdbBind('firebaseDiscussionData', dbRef)
             },
             gotoEditTask() {
-                this.$router.push(`/channels/${this.channelId}/task/${this.taskKey}/edit`)
+                this.$router.push(`${this.$route.path}/edit`)
             },
             bindAuthor(authorUid) {
                 const db = this.$firebase.database()
