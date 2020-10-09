@@ -103,12 +103,12 @@
             },
             bindTask(channelKey, taskKey) {
                 const db = this.$firebase.database()
-                const dbRef = db.ref(`channels/${channelKey}/tasks/${taskKey}`)
+                const dbRef = db.ref(`tasks/${taskKey}`)
                 this.$rtdbBind('firebaseTaskData', dbRef)
             },
             bindDiscussion(channelKey, taskKey) {
                 const db = this.$firebase.database()
-                const dbRef = db.ref(`channels/${channelKey}/tasks/${taskKey}/discussions`)
+                const dbRef = db.ref(`tasks/${taskKey}/discussions`)
                 this.$rtdbBind('firebaseDiscussionData', dbRef)
             },
             gotoEditTask() {
@@ -121,7 +121,7 @@
             },
             makePost() {
                 const db = this.$firebase.database()
-                const dbRef = db.ref(`channels/${this.channelKey}/tasks/${this.taskKey}/discussions`)
+                const dbRef = db.ref(`tasks/${this.taskKey}/discussions`)
 
                 const dataToPush = {
                     author: this.$firebase.auth().currentUser.uid,
@@ -182,7 +182,7 @@
                 this.task.description = val.description
 
                 // bind author data
-                if (!this.firebaseAuthorData) this.bindAuthor(val.author)
+                if (!this.firebaseAuthorData) this.bindAuthor(val.userId)
             },
             firebaseAuthorData(val) {
                 this.task.authorName = val.displayName

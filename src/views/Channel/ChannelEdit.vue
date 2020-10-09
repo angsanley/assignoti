@@ -55,14 +55,14 @@
             upcomingTasks() {
                 let upcomingTasks = []
                 this.tasks.forEach(task => {
-                    if (moment().diff(task.deadlineDate, 'days') <= 0) upcomingTasks.push(task)
+                    if (moment().diff(moment.unix(task['deadlineDate']), 'days') <= 0) upcomingTasks.push(task)
                 })
                 return upcomingTasks
             },
             pastTasks() {
                 let pastTasks = []
                 this.tasks.forEach(task => {
-                    if (moment().diff(task.deadlineDate, 'days') > 0) pastTasks.push(task)
+                    if (moment().diff(moment.unix(task['deadlineDate']), 'days') > 0) pastTasks.push(task)
                 })
                 return pastTasks
             },
@@ -74,7 +74,7 @@
             },
             subscriptions() {
                 return this.$store.state.subscriptions
-            },
+            }
         },
         mounted() {
             if (!parseInt(this.$route.params.id)) {
@@ -86,7 +86,6 @@
                 this.$store.dispatch('getAuthenticatedUser')
 
                 // bind user data
-                this.$store.dispatch('bindUserData')
                 this.$store.dispatch('bindSubscriptions')
             }
         },
@@ -98,31 +97,29 @@
                     console.log(e.message)
                 })
             },
+            bindTasks(channelKey) {
+                const dbQuery = this.$firebase.database().ref('tasks').orderByChild('channelKey').equalTo(channelKey)
+
+                this.$rtdbBind('tasks', dbQuery).catch(e => {
+                    console.log(e.message)
+                })
+            },
             addNewTask() {
                 this.$router.push(`/channels/${this.channelId}/task/new`)
-            },
-            populateTasks() {
-                const tasksObj = this.channel[this.channelKey]['tasks']
-                const keys = Object.keys(tasksObj)
-                this.tasks = []
-
-                keys.forEach(key => {
-                    // get single task
-                    tasksObj[key]['.key'] = key
-                    this.tasks.push(tasksObj[key])
-                })
             },
             gotoTask(taskKey) {
                 this.$router.push(`/channels/${this.channelId}/task/${taskKey}`)
             },
             isSubscribed(channelKey) {
-                const subscriptionKeys = Object.keys(this.subscriptions)
-                for (let x=0; x<subscriptionKeys.length; ++x) {
-                    const subscriptionKey = subscriptionKeys[x]
-                    const subscription = this.subscriptions[subscriptionKey]
+                if (this.subscriptions) {
+                    const subscriptionKeys = Object.keys(this.subscriptions)
+                    for (let x=0; x<subscriptionKeys.length; ++x) {
+                        const subscriptionKey = subscriptionKeys[x]
+                        const subscription = this.subscriptions[subscriptionKey]
 
-                    if (subscription.channelKey === channelKey) {
-                        return true
+                        if (subscription.channelKey === channelKey) {
+                            return true
+                        }
                     }
                 }
                 return false
@@ -164,7 +161,7 @@
                 this.bindChannel(val)
             },
             channel() {
-                this.populateTasks()
+                this.bindTasks(this.channelKey)
             },
         },
     }

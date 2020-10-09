@@ -75,7 +75,7 @@
             },
             bindTask(channelKey, taskKey) {
                 const db = this.$firebase.database()
-                const dbRef = db.ref(`channels/${channelKey}/tasks/${taskKey}`)
+                const dbRef = db.ref(`tasks/${taskKey}`)
                 this.$rtdbBind('firebaseTaskData', dbRef)
             },
             handleSubmit() {
@@ -84,12 +84,13 @@
             },
             updateTask() {
                 const db = this.$firebase.database()
-                const dbRef = db.ref(`channels/${this.channelKey}/tasks/${this.taskKey}`)
+                const dbRef = db.ref(`tasks/${this.taskKey}`)
 
                 const pushData = {
                     name: this.form.name,
-                    deadlineDate: this.form.deadline.toISOString(),
-                    description: this.getEditorMarkdown()
+                    deadlineDate: this.form.deadline.valueOf(),
+                    description: this.getEditorMarkdown(),
+                    modifiedDate: Date.now(),
                 }
 
                 dbRef.update(pushData).then(() => {
@@ -101,12 +102,15 @@
             },
             addTask() {
                 const db = this.$firebase.database()
-                const dbRef = db.ref(`channels/${this.channelKey}/tasks`)
+                const dbRef = db.ref(`tasks`)
 
                 const pushData = {
                     name: this.form.name,
-                    deadlineDate: this.form.deadline.toISOString(),
-                    author: this.$firebase.auth().currentUser.uid,
+                    timestamp: Date.now(),
+                    deadlineDate: this.form.deadline.valueOf(),
+                    modifiedDate: Date.now(),
+                    channelKey: this.channelKey,
+                    userId: this.$firebase.auth().currentUser.uid,
                     description: this.getEditorMarkdown()
                 }
 
@@ -120,7 +124,7 @@
             deleteTask() {
                 if (confirm('Really delete this task?')) {
                     const db = this.$firebase.database()
-                    const dbRef = db.ref(`channels/${this.channelKey}/tasks/${this.taskKey}`)
+                    const dbRef = db.ref(`tasks/${this.taskKey}`)
 
                     dbRef.remove().then(() => {
                         this.$router.push(`/channels/${this.channelId}`)

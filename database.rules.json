@@ -22,5 +22,10 @@
       ".read": "root.child('userId').val() == auth.id",
       ".write": "root.child('userId').val() == auth.id"
     },
+    "tasks": {
+      ".indexOn": ["userId", "channelKey"],
+      ".read": true,
+      ".write": "auth.uid != null"
+    }
   }
 }
