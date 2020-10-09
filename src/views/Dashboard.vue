@@ -11,7 +11,7 @@
 
         <div class="content">
             <the-navbar/>
-            <div class="h-full pt-6 overflow-y-scroll"><router-view/></div>
+            <div class="h-full pt-6 pb-24 lg:pb-0 overflow-y-scroll"><router-view/></div>
         </div>
     </div>
 </template>
