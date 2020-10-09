@@ -111,6 +111,14 @@ function sendMessageToLine(id, message) {
     })
 }
 
+function sendMessageToDiscordWebhook(url, message) {
+    const pushBody = {
+        content: message
+    }
+
+    return axios.post(url, pushBody)
+}
+
 exports.newTaskHandler = functions.database.ref('tasks/{taskKey}')
     .onCreate( (snapshot, context) => {
         Date.prototype.addHours = function (hours) {
@@ -144,6 +152,22 @@ exports.newTaskHandler = functions.database.ref('tasks/{taskKey}')
                                 const message = `New task "${task.name}" added to channel "${channel.channelName}".\nDeadline is ${deadlineString}.`
                                 sendMessageToLine(id, message).then(() => {
                                     functions.logger.info(`Sent message to LINE: ${id}`)
+                                }).catch(e => {
+                                    functions.logger.error(e)
+                                })
+                            })
+                        }
+                    })
+
+                    // search discord webhooks from integrations
+                    admin.database().ref('integrations/discordWebhook').orderByChild('userId').equalTo(userId).once('value').then(snapshot => {
+                        if (snapshot.numChildren() > 0) {
+                            const webhooks = utils.objectToArray(snapshot.val())
+                            webhooks.forEach(({url}) => {
+                                // notify users
+                                const message = `New task "${task.name}" added to channel "${channel.channelName}".\nDeadline is ${deadlineString}.`
+                                sendMessageToDiscordWebhook(url, message).then(() => {
+                                    functions.logger.info(`Sent message to Discord: ${url}`)
                                 }).catch(e => {
                                     functions.logger.error(e)
                                 })
