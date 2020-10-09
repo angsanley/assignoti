@@ -1,6 +1,7 @@
 const functions = require('firebase-functions')
 const admin = require('firebase-admin')
 const axios = require('axios')
+const utils = require('./utils/utils')
 admin.initializeApp(functions.config().firebase)
 
 // // Create and Deploy Your First Cloud Functions
@@ -110,16 +111,16 @@ function sendMessageToLine(id, message) {
     })
 }
 
-exports.newTaskHandler = functions.database.ref('channels/{channelKey}/tasks/{taskKey}')
+exports.newTaskHandler = functions.database.ref('tasks/{taskKey}')
     .onCreate( (snapshot, context) => {
         Date.prototype.addHours = function (hours) {
             this.setHours(this.getHours() + hours)
             return this
         }
 
-        const channelKey = context.params.channelKey
         const taskKey = context.params.taskKey
         const task = snapshot.val()
+        const channelKey = task.channelKey
         const deadlineString = new Date(task.deadlineDate).addHours(7).toDateString() // TODO: change this: add 7 hours (GMT+7)
 
         functions.logger.info({snapshot, context}, {structuredData: true})
@@ -130,47 +131,27 @@ exports.newTaskHandler = functions.database.ref('channels/{channelKey}/tasks/{ta
             const channel = snapshot.val()
 
             // get users who subscribed
-            // TODO: change this to a better approach, maybe flatten the db
-            // iterate through all users
-            admin.database().ref(`users`).once('value').then(s => {
-                // map key-value object to array
-                const users = Object.keys(s.val()).map((key) => {
-                    return {
-                        key: key,
-                        ...s.val()[key]
-                    }
-                })
+            admin.database().ref(`subscriptions`).orderByChild('channelKey').equalTo(channelKey).once('value').then(snapshot => {
+                const subscriptions = utils.objectToArray(snapshot.val())
 
-                users.forEach(user => {
-                    const channels = user['subscribedChannels'] || [] // also handle if user has no subscribed channels
-                    channels.forEach(ch => {
-                        if (ch === channelKey) {
-                            // found the user
-                            const userId = user.key
-                            console.log(userId)
-
-                            // find the integrations
-                            admin.database().ref('integrations').child('lineBot').orderByChild('userId').equalTo(userId).once('value').then(e => {
-                                if (e.val()) { // check if not null (no integrations)
-                                    const lineUsers = Object.keys(e.val())
-
-                                    // send message to all
-                                    lineUsers.forEach(id => {
-                                        // notify users
-                                        const message = `New task "${task.name}" added to channel "${channel.channelName}".\nDeadline is ${deadlineString}.`
-                                        sendMessageToLine(id, message).then(() => {
-                                            functions.logger.info(`Sent message to LINE: ${id}`)
-                                        }).catch(e => {
-                                            functions.logger.error(e)
-                                        })
-                                    })
-                                }
+                subscriptions.forEach(({userId}) => {
+                    // search line id from integrations
+                    admin.database().ref('integrations/lineBot').orderByChild('userId').equalTo(userId).once('value').then(snapshot => {
+                        if (snapshot.numChildren() > 0) {
+                            const lineUserIds = Object.keys(snapshot.val())
+                            lineUserIds.forEach(id => {
+                                // notify users
+                                const message = `New task "${task.name}" added to channel "${channel.channelName}".\nDeadline is ${deadlineString}.`
+                                sendMessageToLine(id, message).then(() => {
+                                    functions.logger.info(`Sent message to LINE: ${id}`)
+                                }).catch(e => {
+                                    functions.logger.error(e)
+                                })
                             })
                         }
                     })
 
                 })
-
             })
         })
     })
