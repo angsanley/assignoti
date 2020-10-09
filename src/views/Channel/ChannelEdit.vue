@@ -72,6 +72,9 @@
             userData() {
                 return this.$store.state.userData
             },
+            subscriptions() {
+                return this.$store.state.subscriptions
+            },
         },
         mounted() {
             if (!parseInt(this.$route.params.id)) {
@@ -84,6 +87,7 @@
 
                 // bind user data
                 this.$store.dispatch('bindUserData')
+                this.$store.dispatch('bindSubscriptions')
             }
         },
         methods: {
@@ -112,26 +116,42 @@
                 this.$router.push(`/channels/${this.channelId}/task/${taskKey}`)
             },
             isSubscribed(channelKey) {
-                const subscribedChannels = this.userData ? this.userData['subscribedChannels'] || [] : [] // check if null
-                return subscribedChannels ? subscribedChannels.includes(channelKey) : false
+                const subscriptionKeys = Object.keys(this.subscriptions)
+                for (let x=0; x<subscriptionKeys.length; ++x) {
+                    const subscriptionKey = subscriptionKeys[x]
+                    const subscription = this.subscriptions[subscriptionKey]
+
+                    if (subscription.channelKey === channelKey) {
+                        return true
+                    }
+                }
+                return false
             },
             handleSubscribe(channelKey) {
                 if (this.isSubscribed(channelKey)) this.doUnsubscribe(channelKey)
                 else this.doSubscribe(channelKey)
             },
             doSubscribe(channelKey) {
-                const subscribedChannels = this.userData ? this.userData['subscribedChannels'] || [] : [] // check if null
-                subscribedChannels.push(channelKey)
-                const dbRef = this.$firebase.database().ref(`/users/${this.user.uid}/subscribedChannels`)
-                dbRef.set(subscribedChannels)
+                const dbRef = this.$firebase.database().ref(`subscriptions/`)
+                const pushObj = {
+                    channelKey,
+                    timestamp: Date.now(),
+                    userId: this.user.uid
+                }
+                dbRef.push(pushObj)
             },
             doUnsubscribe(channelKey) {
-                const subscribedChannels = this.userData ? this.userData['subscribedChannels'] || [] : [] // check if null
-                const index = subscribedChannels.findIndex(key => key === channelKey)
-                // dont remove array directly, use splice instead
-                subscribedChannels.splice(index, 1);
-                const dbRef = this.$firebase.database().ref(`/users/${this.user.uid}/subscribedChannels`)
-                dbRef.set(subscribedChannels)
+                const subscriptionKeys = Object.keys(this.subscriptions)
+                for (let x=0; x<subscriptionKeys.length; ++x) {
+                    const subscriptionKey = subscriptionKeys[x]
+                    const subscription = this.subscriptions[subscriptionKey]
+
+                    if (subscription.channelKey === channelKey) {
+                        const dbRef = this.$firebase.database().ref(`subscriptions/${subscriptionKey}`)
+                        dbRef.set(null)
+                        break
+                    }
+                }
             }
         },
         filters: {

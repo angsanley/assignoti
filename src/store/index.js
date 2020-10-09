@@ -9,7 +9,8 @@ export default new Vuex.Store({
     state: {
         user: null,
         userData: null,
-        sidebarHidden: true
+        subscriptions: null,
+        sidebarHidden: true,
     },
     mutations: {
         ...vuexfireMutations,
@@ -31,6 +32,10 @@ export default new Vuex.Store({
         bindUserData: firebaseAction(({ state, bindFirebaseRef }) => {
             const dbRef = firebase.database().ref(`/users/${state.user.uid}`)
             return bindFirebaseRef('userData', dbRef)
+        }),
+        bindSubscriptions: firebaseAction(({ state, bindFirebaseRef }) => {
+            const dbRef = firebase.database().ref(`subscriptions`).orderByChild('userId').equalTo(state.user.uid)
+            return bindFirebaseRef('subscriptions', dbRef)
         }),
         doSocialSignIn: ({commit, dispatch}, using) => {
             return new Promise(((resolve, reject) => {

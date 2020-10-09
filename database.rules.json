@@ -12,6 +12,15 @@
         ".read": true,
         ".write": "auth.uid == $uid"
       }
-    }
+    },
+    "integrations": {
+      ".read": true,
+      ".write": true
+    },
+    "subscriptions": {
+      ".indexOn": "userId",
+      ".read": "root.child('userId').val() == auth.id",
+      ".write": "root.child('userId').val() == auth.id"
+    },
   }
 }

@@ -15,7 +15,8 @@
 
                 <button v-for="channel in channels" :key="channel.id" @click="gotoChannel(channel.id)">
                     <Card class="item">
-                        {{ channel.channelName }}
+                        <span v-if="channel.channelName">{{ channel.channelName }}</span>
+                        <span v-else>Loading...</span>
                     </Card>
                 </button>
             </div>
@@ -26,53 +27,48 @@
 <script>
     import Card from "../../components/Card";
     import { SearchIcon } from 'vue-feather-icons'
+    import {objectToArray} from "../../utils/ObjectToArray";
     export default {
         name: "Subscriptions",
         components: {Card, SearchIcon},
+        data() {
+            return {
+                channels: {}
+            }
+        },
         methods: {
             gotoChannel(id) {
                 this.$router.push(`/dashboard/channels/${id}`)
             },
-            getChannelsInfo(user) {
-                // get channels info
-                if (user) {
-                    user['subscribedChannels'].forEach(channelKey => {
-                        this.$firebase.database().ref(`channels/${channelKey}`).once('value').then(snapshot => {
-                            this.$set(this.channels, channelKey, snapshot.val())
-                        })
-                    })
-                }
-            },
-            getUserData(userObj) {
-                // get user data
-                const users = this.$firebase.database().ref('users')
-                this.$rtdbBind('user', users.child(userObj.uid))
-            },
             gotoExplore() {
                 this.$router.push('/dashboard/channels')
+            },
+            loadSubscriptionsData(subscriptions) {
+                for (let x=0; x<subscriptions.length; ++x) {
+                    const obj = subscriptions[x]
+                    const channelKey = obj.channelKey
+                    this.$set(this.channels, channelKey, obj)
+                    this.fetchChannelInfo(obj)
+                }
+            },
+            fetchChannelInfo({channelKey}) {
+                this.$firebase.database().ref(`channels/${channelKey}`).once('value').then(snapshot => {
+                    this.$set(this.channels, channelKey, snapshot.val())
+                })
             }
         },
         mounted() {
-            this.$store.dispatch('getAuthenticatedUser')
-            this.getUserData(this.userObj)
-        },
-        data() {
-            return {
-                user: {},
-                channels: {}
-            }
+            //bind subscriptions
+            this.$store.dispatch('bindSubscriptions')
         },
         computed: {
-            userObj() {
-                return this.$store.state.user
-            },
+            subscriptionsArray() {
+                return objectToArray(this.$store.state.subscriptions)
+            }
         },
         watch: {
-            userObj(val) {
-                this.getUserData(val)
-            },
-            user(val) {
-                this.getChannelsInfo(val)
+            subscriptionsArray(newVal) {
+                this.loadSubscriptionsData(newVal)
             }
         }
     }
