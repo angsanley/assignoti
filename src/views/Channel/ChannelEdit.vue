@@ -55,14 +55,14 @@
             upcomingTasks() {
                 let upcomingTasks = []
                 this.tasks.forEach(task => {
-                    if (moment().diff(moment.unix(task['deadlineDate']), 'days') <= 0) upcomingTasks.push(task)
+                    if (moment().diff(task['deadlineDate'], 'days') <= 0) upcomingTasks.push(task)
                 })
                 return upcomingTasks
             },
             pastTasks() {
                 let pastTasks = []
                 this.tasks.forEach(task => {
-                    if (moment().diff(moment.unix(task['deadlineDate']), 'days') > 0) pastTasks.push(task)
+                    if (moment().diff(task['deadlineDate'], 'days') > 0) pastTasks.push(task)
                 })
                 return pastTasks
             },
