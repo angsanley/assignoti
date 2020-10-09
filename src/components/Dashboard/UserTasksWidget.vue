@@ -51,50 +51,44 @@
                 console.log({channelId, taskKey})
                 this.$emit('click',  {channelId, taskKey})
             },
-            handleCheckbox({checked, channelId, taskKey}) {
-                // get channel key from channel id
-                const dbRef = this.$firebase.database().ref('channels')
-                dbRef.orderByChild('id').equalTo(channelId).limitToFirst(1).once('value').then(snapshot => {
-                    const key = Object.keys(snapshot.val())[0]
-                    const userId = this.user.uid
+            handleCheckbox({checked, taskKey}) {
+                const userId = this.user.uid
+                const taskUsersDoneRef = this.$firebase.database().ref(`tasks/${taskKey}/usersDone/${userId}`)
+                if (checked) {
+                    // set task as done
+                    const taskDone = {
+                        done: true,
+                        dateDone: new Date().toISOString()
+                    }
+                    taskUsersDoneRef.set(taskDone)
 
-                    const taskUsersDoneRef = this.$firebase.database().ref(`channels/${key}/tasks/${taskKey}/usersDone/${userId}`)
-                    if (checked) {
-                        // set task as done
-                        const taskDone = {
-                            done: true,
-                            dateDone: new Date().toISOString()
-                        }
-                        taskUsersDoneRef.set(taskDone)
+                    // move task to done
+                    for (let x=0; x<this.tasks.upcoming.length; ++x) {
+                        let task = this.tasks.upcoming[x]
+                        if (task['.key'] === taskKey) {
+                            task.usersDone = task.usersDone ? task.usersDone : {}
+                            task.usersDone[userId] = taskDone
 
-                        // move task to done
-                        for (let x=0; x<this.tasks.upcoming.length; ++x) {
-                            let task = this.tasks.upcoming[x]
-                            if (task['.key'] === taskKey) {
-                                task.usersDone = task.usersDone ? task.usersDone : {}
-                                task.usersDone[userId] = taskDone
-
-                                this.tasks.done.push(task)
-                                this.tasks.upcoming.splice(x, 1)
-                                return
-                            }
-                        }
-
-                    } else {
-                        taskUsersDoneRef.set(null)
-
-                        // move task to upcoming
-                        for (let x=0; x<this.tasks.done.length; ++x) {
-                            let task = this.tasks.done[x]
-                            if (task['.key'] === taskKey) {
-                                delete task.usersDone[userId]
-                                this.tasks.upcoming.push(task)
-                                this.tasks.done.splice(x, 1)
-                                return
-                            }
+                            this.tasks.done.push(task)
+                            this.tasks.upcoming.splice(x, 1)
+                            return
                         }
                     }
-                })
+
+                } else {
+                    taskUsersDoneRef.set(null)
+
+                    // move task to upcoming
+                    for (let x=0; x<this.tasks.done.length; ++x) {
+                        let task = this.tasks.done[x]
+                        if (task['.key'] === taskKey) {
+                            delete task.usersDone[userId]
+                            this.tasks.upcoming.push(task)
+                            this.tasks.done.splice(x, 1)
+                            return
+                        }
+                    }
+                }
             },
             upcomingTab() {
                 this.currentTab = 'upcoming'

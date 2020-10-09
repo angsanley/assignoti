@@ -12,6 +12,7 @@
 
 <script>
     import UserTasksWidget from "../../components/Dashboard/UserTasksWidget";
+    import {objectToArray} from "../../utils/ObjectToArray";
     export default {
         name: "DashboardHome",
         components: {UserTasksWidget},
@@ -23,6 +24,7 @@
         mounted() {
             this.$store.dispatch('getAuthenticatedUser')
             this.$store.dispatch('bindUserData')
+            this.$store.dispatch('bindSubscriptions')
         },
         computed: {
             user() {
@@ -32,7 +34,7 @@
                 return this.$store.state.userData
             },
             subscribedChannels() {
-                return this.userData ? this.userData.subscribedChannels : []
+                return objectToArray(this.$store.state.subscriptions)
             },
         },
         watch: {
@@ -44,9 +46,8 @@
         methods: {
             getTasksList(channels) {
                 for (let x=0; x<channels.length; ++x) {
-                    const channelKey = channels[x]
-                    const dbRef = this.$firebase.database().ref(`/channels/${channelKey}/tasks`)
-
+                    const channelKey = channels[x].channelKey
+                    const dbRef = this.$firebase.database().ref(`tasks`).orderByChild('channelKey').equalTo(channelKey)
                     dbRef.once('value').then(snapshot => {
                         const tasksObj = snapshot.val()
                         const keys = Object.keys(tasksObj)
@@ -54,7 +55,7 @@
                         // iterate every task object
                         for (let y=0; y<keys.length; ++y) {
                             let task = tasksObj[keys[y]]
-                            if (Date.parse(task.deadlineDate) < Date.parse(Date())) continue // skip past tasks
+                            if (task.deadlineDate < Date.now()) continue // skip past tasks
                             task['.key'] = keys[y]
                             task.channelKey = channelKey
                             delete task.description // remove unused description
