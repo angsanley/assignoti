@@ -15,7 +15,13 @@
     },
     "integrations": {
       ".read": true,
-      ".write": true
+      ".write": true,
+      "lineBot": {
+        ".indexOn": "userId"
+      },
+      "discordWebhook": {
+        ".indexOn": "userId"
+      }
     },
     "subscriptions": {
       ".indexOn": "userId",
@@ -26,6 +32,6 @@
       ".indexOn": ["userId", "channelKey"],
       ".read": true,
       ".write": "auth.uid != null"
-    }
+    },
   }
 }
