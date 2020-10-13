@@ -1,6 +1,8 @@
 const functions = require('firebase-functions')
 const admin = require('firebase-admin')
 const axios = require('axios')
+const FormData = require('form-data')
+const fs = require('fs')
 const utils = require('./utils/utils')
 admin.initializeApp(functions.config().firebase)
 
@@ -111,12 +113,48 @@ function sendMessageToLine(id, message) {
     })
 }
 
-function sendMessageToDiscordWebhook(url, message) {
-    const pushBody = {
-        content: message
+async function sendMessageToDiscordWebhook (url, message, files) {
+    let formData = new FormData();
+    formData.append("content", message)
+
+    if (files) {
+        // get first 10 items only
+        if (files.length > 10) files = files.slice(0,10)
+
+        // download file from URL
+        const downloadPromises = []
+        files.forEach(file => {
+            downloadPromises.push(new Promise(async (resolve, reject) => {
+                axios({
+                    url: file.url,
+                    method: 'GET',
+                    responseType: 'stream'
+                }).then(res => {
+                    const stream = res.data.pipe(fs.createWriteStream(`/tmp/${file.fileName}`))
+                    // wait until file finished downloading
+                    stream.on('finish', () => {
+                        formData.append(file.fileName, fs.createReadStream(`/tmp/${file.fileName}`))
+                        resolve()
+                    })
+                }).catch(e => {
+                    reject(e)
+                })
+            }))
+        })
+
+        await Promise.all(downloadPromises)
     }
 
-    return axios.post(url, pushBody)
+    const config = {
+        method: 'post',
+        url,
+        headers: {
+            ...formData.getHeaders()
+        },
+        data: formData,
+    }
+
+    return axios(config)
 }
 
 exports.newTaskHandler = functions.database.ref('tasks/{taskKey}')
@@ -129,12 +167,21 @@ exports.newTaskHandler = functions.database.ref('tasks/{taskKey}')
         const taskKey = context.params.taskKey
         const task = snapshot.val()
         const channelKey = task.channelKey
+        const attachmentKeys = task.attachments
         const deadlineString = new Date(task.deadlineDate).addHours(7).toDateString() // TODO: change this: add 7 hours (GMT+7)
 
         functions.logger.info({snapshot, context}, {structuredData: true})
 
+        // get attachments data
+        let attachmentPromises = []
+        let attachments = []
+        attachmentKeys.forEach(key => {
+            attachmentPromises.push(admin.database().ref(`attachments/${key}`).once('value').then(snap => snap.val()))
+        })
+        Promise.all(attachmentPromises).then(res => attachments = res)
+
         // get channel data
-        const channelDataRef =  admin.database().ref(`channels/${channelKey}`)
+        const channelDataRef = admin.database().ref(`channels/${channelKey}`)
         channelDataRef.once('value').then(snapshot => {
             const channel = snapshot.val()
 
@@ -166,7 +213,7 @@ exports.newTaskHandler = functions.database.ref('tasks/{taskKey}')
                             webhooks.forEach(({url}) => {
                                 // notify users
                                 const message = `New task "${task.name}" added to channel "${channel.channelName}".\nDeadline is ${deadlineString}.`
-                                sendMessageToDiscordWebhook(url, message).then(() => {
+                                sendMessageToDiscordWebhook(url, message, attachments).then(() => {
                                     functions.logger.info(`Sent message to Discord: ${url}`)
                                 }).catch(e => {
                                     functions.logger.error(e)
