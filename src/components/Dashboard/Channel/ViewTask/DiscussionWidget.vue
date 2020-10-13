@@ -1,5 +1,5 @@
 <template>
-    <Card class="m-2 p-2 space-y-2 hidden lg:block">
+    <Card class="m-2 p-2 space-y-2">
         <div class="card-title">Discussions</div>
         <div class="flex flex-row w-full my-1"
              v-for="({ timestamp, author, content }, i) in discussions"

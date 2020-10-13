@@ -13,41 +13,21 @@
                             <div class="flex items-center space-x-2"><CalendarIcon size="1x"/> <div>{{ task.deadlineDate | dateFormat }}</div></div>
                             <div class="flex items-center space-x-2"><UserIcon size="1x"/> <div>Posted by {{ task.authorName }}</div></div>
                         </div>
-                    </Card>
-                    <Card class="m-2 p-2 space-y-2">
-                        <div class="card-title">Discussions</div>
-                        <div class="flex flex-row w-full my-1"
-                            v-for="({ timestamp, author, content }, i) in discussions" 
-                            :key="`#post-${timestamp}-${i}`"
-                        >
-                            <img 
-                                class="w-8 h-8 rounded-full flex-shrink-0"
-                                :src="participatingUsers[author].photoURL" 
-                            />
-                            <div class="ml-2 self-center leading-tight">
-                                <span class="font-display font-bold">
-                                    {{ participatingUsers[author].displayName }}
-                                </span>
-                                {{content}}
-                                <span class="font-light text-xs">
-                                    {{ timestamp | relativeDateFormat }}
-                                </span>
+
+                        <div>
+                            <span>Attachments:</span>
+                            <div v-for="attachment in this.task.attachments" v-bind:key="attachment.fileName">
+                                <a :href="attachment.url" target="_blank">{{ attachment.fileName }}</a>
                             </div>
                         </div>
-                        <Input 
-                            v-model="discussionContent"
-                            name="task-name" 
-                            id="task-name" 
-                            type="text" 
-                            placeholder="Got anything in your mind?" 
-                            :textarea="true"  
-                        />
-                        <Button @click="makePost()" class="pt-4 w-full" primary>
-                            <span class="text-center w-full">Post</span>
-                        </Button>
                     </Card>
+
+                    <DiscussionWidget class="hidden lg:block" :channel="channel" :taskKey="taskKey"/> <!--For PC view-->
+
                 </div>
             </div>
+
+            <DiscussionWidget class="lg:hidden" :channel="channel" :taskKey="taskKey"/> <!--For mobile view-->
         </div>
 
         <floating-action-button primary @click="gotoEditTask()" v-if="user"><EditIcon/></floating-action-button>
@@ -62,27 +42,36 @@
     import FloatingActionButton from "../../components/FloatingActionButton"
     import Button from '@/components/Button'
     import Input from '@/components/Input'
+    import DiscussionWidget from "../../components/Dashboard/Channel/ViewTask/DiscussionWidget";
 
     export default {
         name: "ViewTask",
-        components: {FloatingActionButton, Card, VueMarkdown, CalendarIcon, BookIcon, UserIcon, EditIcon, Input, Button},
+        components: {
+            DiscussionWidget,
+            FloatingActionButton,
+            Card,
+            VueMarkdown,
+            CalendarIcon,
+            BookIcon,
+            UserIcon,
+            EditIcon,
+            Input,
+            Button
+        },
         data() {
             return {
                 task: {
                     name: '',
                     deadline: new Date(),
                     description: '',
-                    authorName: ''
+                    authorName: '',
+                    attachments: []
                 },
-                discussions: [],
-                participatingUsers: {}, // users participating in discussion
                 channel: {},
                 channelId: 0,
-                discussionContent: '',
                 taskKey: null,
                 firebaseTaskData: null,
                 firebaseAuthorData: null,
-                firebaseDiscussionData: null
             }
         },
         computed: {
@@ -106,11 +95,6 @@
                 const dbRef = db.ref(`tasks/${taskKey}`)
                 this.$rtdbBind('firebaseTaskData', dbRef)
             },
-            bindDiscussion(channelKey, taskKey) {
-                const db = this.$firebase.database()
-                const dbRef = db.ref(`tasks/${taskKey}/discussions`)
-                this.$rtdbBind('firebaseDiscussionData', dbRef)
-            },
             gotoEditTask() {
                 this.$router.push(`${this.$route.path}/edit`)
             },
@@ -119,32 +103,18 @@
                 const dbRef = db.ref(`users/${authorUid}`)
                 this.$rtdbBind('firebaseAuthorData', dbRef)
             },
-            makePost() {
+            getAttachmentsInfo(fileKeys) {
                 const db = this.$firebase.database()
-                const dbRef = db.ref(`tasks/${this.taskKey}/discussions`)
-
-                const dataToPush = {
-                    author: this.$firebase.auth().currentUser.uid,
-                    timestamp: (new Date()).toISOString(),
-                    content: this.discussionContent
-                };
-
-                dbRef.push(dataToPush)
-                    .then(() => {
-                        this.discussionContent = ''
-                    })
-                    .catch(e => {
-                        alert('ngeri')
-                        console.log(e.message)
-                    })
+                this.task.attachments = [] //reset
+                fileKeys.forEach(key => {
+                    const dbRef = db.ref(`attachments/${key}`)
+                    dbRef.once('value').then(snap => this.task.attachments.push(snap.val()))
+                })
             }
         },
         filters: {
             dateFormat(date) {
                 return moment(date).format("MMM Do YYYY")
-            },
-            relativeDateFormat(date) {
-                return moment(date).fromNow()
             }
         },
         mounted() {
@@ -169,34 +139,26 @@
             channel() {
                 if (this.taskKey) {
                     this.bindTask(this.channelKey, this.taskKey)
-                    this.bindDiscussion(this.channelKey, this.taskKey)
                 }
             },
             form() {
                 console.log(this.form.deadline)
             },
             firebaseTaskData(val) {
-                // update form data with firebase 
+                // update form data with firebase
                 this.task.name = val.name
                 this.task.deadline = new Date(val.deadlineDate)
                 this.task.description = val.description
 
                 // bind author data
                 if (!this.firebaseAuthorData) this.bindAuthor(val.userId)
+
+                // get attachments
+                if (val.attachments) this.getAttachmentsInfo(val.attachments)
             },
             firebaseAuthorData(val) {
                 this.task.authorName = val.displayName
             },
-            firebaseDiscussionData(val) {
-                this.discussions = Object.values(val)
-                Object.values(val).forEach(({ author }) => {
-                    // check if user data has been fetched
-                    !this.participatingUsers[author] && this.$firebase.database().ref(`users/${author}`).once('value')
-                        .then(snapshot => {
-                            this.$set(this.participatingUsers, author, snapshot.val())
-                        })
-                })
-            }
         }
     }
 </script>
