@@ -14,7 +14,7 @@
                             <div class="flex items-center space-x-2"><UserIcon size="1x"/> <div>Posted by {{ task.authorName }}</div></div>
                         </div>
 
-                        <div>
+                        <div v-if="this.task.attachments.length > 0">
                             <span>Attachments:</span>
                             <div v-for="attachment in this.task.attachments" v-bind:key="attachment.fileName">
                                 <a :href="attachment.url" target="_blank">{{ attachment.fileName }}</a>
