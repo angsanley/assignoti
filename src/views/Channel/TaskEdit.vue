@@ -20,8 +20,21 @@
                         <editor ref="descriptionEditor" initialEditType="wysiwyg"/>
                     </div>
                     <div>
-                        <label for="attachment">Attachment:</label>
-
+                        <label for="attachment">Attachments:</label>
+                        <VueFileAgent
+                                ref="fileAgent"
+                                :theme="'list'"
+                                :maxSize="'10MB'"
+                                :maxFiles="5"
+                                :deletable="true"
+                                :multiple="true"
+                                :errorText="{
+                                  size: 'Files should not exceed 10MB in size',
+                                }"
+                                v-model="fileRecords"
+                                @beforedelete="onBeforeDelete($event)"
+                                @delete="onDelete($event)"
+                        ></VueFileAgent>
                     </div>
                     <Button class="pt-4" primary>
                         <span class="text-center w-full" v-if="!this.taskKey">Add Task</span>
@@ -40,14 +53,19 @@
     import Input from "../../components/Input";
     import Card from "../../components/Card";
     import Button from "../../components/Button";
+    import VueFileAgentPlugin from 'vue-file-agent';
+    const VueFileAgent = VueFileAgentPlugin.VueFileAgent;
+    import 'vue-file-agent/dist/vue-file-agent.css';
     import DatePicker from 'v-calendar/lib/components/date-picker.umd'
     import '@/assets/css/codemirror.css';
     import '@/assets/css/toastui-editor.css';
     import { Editor } from '@toast-ui/vue-editor';
     import moment from 'moment'
+    import * as uuid from 'uuid'
+    import {uploadAttachment} from "../../plugins/storage";
     export default {
         name: "TaskEdit",
-        components: {Button, Card, Input, DatePicker, Editor},
+        components: {Button, Card, Input, DatePicker, Editor, VueFileAgent},
         data() {
             return {
                 form: {
@@ -57,7 +75,8 @@
                 channel: {},
                 channelId: 0,
                 taskKey: null,
-                firebaseTaskData: null
+                firebaseTaskData: null,
+                fileRecords: []
             }
         },
         computed: {
@@ -100,9 +119,11 @@
                     console.log(e.message)
                 })
             },
-            addTask() {
+            async addTask() {
                 const db = this.$firebase.database()
                 const dbRef = db.ref(`tasks`)
+
+                const fileKeys = await this.uploadFiles() || []
 
                 const pushData = {
                     name: this.form.name,
@@ -111,7 +132,8 @@
                     modifiedDate: Date.now(),
                     channelKey: this.channelKey,
                     userId: this.$firebase.auth().currentUser.uid,
-                    description: this.getEditorMarkdown()
+                    description: this.getEditorMarkdown(),
+                    attachments: fileKeys
                 }
 
                 dbRef.push(pushData).then(() => {
@@ -136,7 +158,44 @@
             },
             getEditorMarkdown() {
                 return this.$refs.descriptionEditor.invoke('getMarkdown');
-            }
+            },
+            uploadFiles() {
+                return new Promise(((resolve, reject) => {
+                    const sizeLimit = 10240000 // 10 MB
+                    const uploadFilePromises = []
+
+                    // iterate all files
+                    for (let x=0; x<this.fileRecords.length; ++x) {
+                        const file = this.fileRecords[x]
+                        const originalFileName = file.file.name.replace(/\.[^/.]+$/, '')
+                        const fileName = `${originalFileName}_${uuid.v4()}.${file.ext}`
+
+                        if (this.fileRecords[x].size > sizeLimit) {
+                            this.fileRecords.splice(x,1)
+                        } else {
+                            // add to promise list
+                            uploadFilePromises.push(uploadAttachment(file.file, fileName))
+                        }
+                    }
+
+                    // run all promises
+                    Promise.all(uploadFilePromises).then(snapshots => {
+                        const keys = snapshots.map(snapshot => {
+                            return snapshot.ref.key
+                        })
+                        resolve(keys)
+
+                    }).catch(e => {
+                        reject(e)
+                    })
+                }))
+            },
+            onBeforeDelete(fileRecord){
+                this.$refs.fileAgent.deleteFileRecord(fileRecord);
+            },
+            onDelete(fileRecord) {
+                console.log(fileRecord)
+            },
         },
         filters: {
             dateFormat(date) {
