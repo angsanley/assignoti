@@ -65,7 +65,7 @@
                 }
             },
             handleTaskClick(task) {
-                this.$router.push(`/channels/${task.channelId}/task/${task.taskKey}`)
+                this.$router.push(`/dashboard/channels/${task.channelId}/task/${task.taskKey}`)
             }
         }
     }
