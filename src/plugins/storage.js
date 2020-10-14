@@ -17,14 +17,14 @@ const insertIntoDb = (params) => {
     return dbRef.push(pushObject)
 }
 
-const getFileDownloadUrl = async (fileName) => {
-    const fileSnapshot = await storageRef.child(fileName)
-    return await fileSnapshot.metadata.ref.getDownloadURL()
-}
-
-const checkIfFileExist = (md5Hash) => {
-    return dbRef.orderByChild('md5Hash').equalTo(md5Hash).once('value').then(snapshot => snapshot.exists())
-}
+// const getFileDownloadUrl = async (fileName) => {
+//     const fileSnapshot = await storageRef.child(fileName)
+//     return await fileSnapshot.metadata.ref.getDownloadURL()
+// }
+//
+// const checkIfFileExist = (md5Hash) => {
+//     return dbRef.orderByChild('md5Hash').equalTo(md5Hash).once('value').then(snapshot => snapshot.exists())
+// }
 
 export const uploadAttachment = async (file, fileName) => {
     const fileSnapshot = await uploadFileToStorage(file, fileName)
