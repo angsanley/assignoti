@@ -58,7 +58,7 @@
     }
 
     .channels > button {
-        @apply m-2 w-56 h-32 transition ease-in-out duration-200
+        @apply m-2 w-full h-32 transition ease-in-out duration-200
     }
 
     .channels > button:active {
@@ -75,5 +75,11 @@
 
     .add-item {
         @apply text-primary
+    }
+
+    @screen lg {
+        .channels > button {
+            @apply w-56
+        }
     }
 </style>
