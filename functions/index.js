@@ -118,6 +118,8 @@ async function sendMessageToDiscordWebhook (url, message, files) {
     formData.append("content", message)
     formData.append("avatar_url", 'https://assignoti.web.app/img/icons/icon-512x512.png')
 
+    if (!files) files = []
+
     // if there is files
     if (files.length > 0) {
         // get first 10 items only
@@ -169,7 +171,7 @@ exports.newTaskHandler = functions.database.ref('tasks/{taskKey}')
         const taskKey = context.params.taskKey
         const task = snapshot.val()
         const channelKey = task.channelKey
-        const attachmentKeys = task.attachments
+        const attachmentKeys = task.attachments || []
         const deadlineString = new Date(task.deadlineDate).addHours(7).toDateString() // TODO: change this: add 7 hours (GMT+7)
 
         functions.logger.info({snapshot, context}, {structuredData: true})
