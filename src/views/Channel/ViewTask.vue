@@ -10,7 +10,7 @@
                         <div class="card-title">{{ task.name }}</div>
                         <div>
                             <div class="flex items-center space-x-2"><BookIcon size="1x"/> <div>{{ channel[channelKey]['channelName'] }}</div></div>
-                            <div class="flex items-center space-x-2"><CalendarIcon size="1x"/> <div>{{ task.deadlineDate | dateFormat }}</div></div>
+                            <div class="flex items-center space-x-2"><CalendarIcon size="1x"/> <div>{{ task.deadline | dateFormat }}</div></div>
                             <div class="flex items-center space-x-2"><UserIcon size="1x"/> <div>Posted by {{ task.authorName }}</div></div>
                         </div>
 
@@ -40,8 +40,6 @@
     import Card from "../../components/Card"
     import { CalendarIcon, BookIcon, UserIcon, EditIcon } from 'vue-feather-icons'
     import FloatingActionButton from "../../components/FloatingActionButton"
-    import Button from '@/components/Button'
-    import Input from '@/components/Input'
     import DiscussionWidget from "../../components/Dashboard/Channel/ViewTask/DiscussionWidget";
 
     export default {
@@ -55,8 +53,6 @@
             BookIcon,
             UserIcon,
             EditIcon,
-            Input,
-            Button
         },
         data() {
             return {
