@@ -116,8 +116,10 @@ function sendMessageToLine(id, message) {
 async function sendMessageToDiscordWebhook (url, message, files) {
     let formData = new FormData();
     formData.append("content", message)
+    formData.append("avatar_url", 'https://assignoti.web.app/img/icons/icon-512x512.png')
 
-    if (files) {
+    // if there is files
+    if (files.length > 0) {
         // get first 10 items only
         if (files.length > 10) files = files.slice(0,10)
 
